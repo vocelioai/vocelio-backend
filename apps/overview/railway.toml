@@ -17,9 +17,8 @@ SERVICE_NAME = "vocelio-overview"
 SERVICE_VERSION = "1.0.0"
 ENVIRONMENT = "production"
 
-# Server Configuration
+# Server Configuration - Railway will set PORT dynamically
 HOST = "0.0.0.0"
-PORT = "8000"
 DEBUG = "false"
 
 # Database Configuration
