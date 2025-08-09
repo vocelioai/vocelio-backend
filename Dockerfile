@@ -24,7 +24,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 
 # Copy only requirements first for better layer caching
-COPY requirements.txt ./
+COPY requirements.txt constraints.txt ./
 
 # (Optional) If you later split heavy deps, uncomment and COPY requirements-core.txt first
 # COPY requirements-core.txt ./
@@ -33,7 +33,7 @@ COPY requirements.txt ./
 RUN python -m venv /opt/venv \
   && . /opt/venv/bin/activate \
   && pip install --upgrade pip wheel setuptools \
-  && pip install --no-cache-dir -r requirements.txt
+  && pip install --no-cache-dir -r requirements.txt -c constraints.txt
 
 ENV PATH="/opt/venv/bin:$PATH"
 

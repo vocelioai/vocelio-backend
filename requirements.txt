@@ -10,7 +10,8 @@ gunicorn==21.2.0
 sqlalchemy==2.0.23
 alembic==1.12.1
 asyncpg==0.29.0
-redis[hiredis]==5.0.1
+# Redis client (dramatiq 1.14.x requires redis <5). If upgrading dramatiq, you can raise this to 5.x
+redis[hiredis]==4.6.0
 
 # Authentication & Security
 python-jose[cryptography]==3.3.0

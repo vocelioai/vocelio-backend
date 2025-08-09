@@ -1,0 +1,29 @@
+# Central version constraints to help pip's resolver and avoid conflicts
+# Include with: pip install -r requirements.txt -c constraints.txt
+
+# Force numpy compatible with librosa 0.10.1 on manylinux2014
+numpy==1.25.2
+# librosa 0.10.1 depends on soundfile, numba etc.
+numba==0.58.1
+llvmlite==0.41.1
+
+# Pin aiohttp transitive deps
+multidict==6.0.4
+yarl==1.9.4
+frozenlist==1.4.0
+aiosignal==1.3.1
+
+# Ensure click compatibility for Typer
+click==8.1.7
+
+# Prevent openai / anthropic overlap issues
+httpx==0.25.2
+
+# Celery Kombu/Redis compatibility (redis pinned in requirements)
+# Avoid newer kombu requiring redis>=5
+kombu==5.3.4
+
+# Prevent setuptools regressions
+setuptools==69.0.2
+wheel==0.42.0
+pip==23.3.2
