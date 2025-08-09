@@ -12,8 +12,8 @@ from contextlib import asynccontextmanager
 import logging
 from typing import Dict, Any
 
-from api.v1.api import api_router
-from core.config import settings
+from src.api.v1.api import api_router
+from src.core.config import settings
 from shared.middleware.cors import add_cors_middleware
 from shared.middleware.request_logging import add_request_logging
 from shared.middleware.error_handling import add_error_handling
