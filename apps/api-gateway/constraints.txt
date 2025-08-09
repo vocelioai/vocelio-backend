@@ -1,0 +1,4 @@
+# lock core transitive deps to compatible versions
+starlette==0.37.2
+pydantic==2.8.2
+pydantic-core==2.20.1
