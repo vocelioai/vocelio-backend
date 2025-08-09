@@ -1,0 +1,175 @@
+# apps/api-gateway/Dockerfile
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements first for better caching
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY src/ ./src/
+COPY shared/ ./shared/
+
+# Create non-root user
+RUN useradd --create-home --shell /bin/bash vocelio
+RUN chown -R vocelio:vocelio /app
+USER vocelio
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:${PORT:-8000}/health || exit 1
+
+# Expose port
+EXPOSE 8000
+
+# Start command
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
+
+---
+# apps/api-gateway/railway.toml
+[build]
+builder = "DOCKERFILE"
+
+[deploy]
+healthcheckPath = "/health"
+healthcheckTimeout = 10
+startCommand = "uvicorn src.main:app --host 0.0.0.0 --port $PORT"
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
+
+[env]
+# Gateway Configuration
+ENVIRONMENT = "production"
+LOG_LEVEL = "INFO" 
+DEBUG = "false"
+
+# Security
+SECRET_KEY = "${{Postgres.RAILWAY_GENERATE_SECRET}}"
+ALLOWED_ORIGINS = "*"
+
+# Rate Limiting
+RATE_LIMIT_REQUESTS = "5000"
+REDIS_URL = "${{Redis.REDIS_URL}}"
+
+# Service Discovery
+SERVICE_DISCOVERY_ENABLED = "true"
+HEALTH_CHECK_INTERVAL = "30"
+
+# Service URLs (Railway will auto-populate these)
+OVERVIEW_SERVICE_URL = "${{OVERVIEW_SERVICE.RAILWAY_PUBLIC_DOMAIN}}"
+AGENTS_SERVICE_URL = "${{AGENTS_SERVICE.RAILWAY_PUBLIC_DOMAIN}}"
+SMART_CAMPAIGNS_SERVICE_URL = "${{SMART_CAMPAIGNS_SERVICE.RAILWAY_PUBLIC_DOMAIN}}"
+CALL_CENTER_SERVICE_URL = "${{CALL_CENTER_SERVICE.RAILWAY_PUBLIC_DOMAIN}}"
+PHONE_NUMBERS_SERVICE_URL = "${{PHONE_NUMBERS_SERVICE.RAILWAY_PUBLIC_DOMAIN}}"
+VOICE_MARKETPLACE_SERVICE_URL = "${{VOICE_MARKETPLACE_SERVICE.RAILWAY_PUBLIC_DOMAIN}}"
+VOICE_LAB_SERVICE_URL = "${{VOICE_LAB_SERVICE.RAILWAY_PUBLIC_DOMAIN}}"
+FLOW_BUILDER_SERVICE_URL = "${{FLOW_BUILDER_SERVICE.RAILWAY_PUBLIC_DOMAIN}}"
+ANALYTICS_PRO_SERVICE_URL = "${{ANALYTICS_PRO_SERVICE.RAILWAY_PUBLIC_DOMAIN}}"
+AI_BRAIN_SERVICE_URL = "${{AI_BRAIN_SERVICE.RAILWAY_PUBLIC_DOMAIN}}"
+INTEGRATIONS_SERVICE_URL = "${{INTEGRATIONS_SERVICE.RAILWAY_PUBLIC_DOMAIN}}"
+AGENT_STORE_SERVICE_URL = "${{AGENT_STORE_SERVICE.RAILWAY_PUBLIC_DOMAIN}}"
+BILLING_PRO_SERVICE_URL = "${{BILLING_PRO_SERVICE.RAILWAY_PUBLIC_DOMAIN}}"
+TEAM_HUB_SERVICE_URL = "${{TEAM_HUB_SERVICE.RAILWAY_PUBLIC_DOMAIN}}"
+COMPLIANCE_SERVICE_URL = "${{COMPLIANCE_SERVICE.RAILWAY_PUBLIC_DOMAIN}}"
+WHITE_LABEL_SERVICE_URL = "${{WHITE_LABEL_SERVICE.RAILWAY_PUBLIC_DOMAIN}}"
+DEVELOPER_API_SERVICE_URL = "${{DEVELOPER_API_SERVICE.RAILWAY_PUBLIC_DOMAIN}}"
+SETTINGS_SERVICE_URL = "${{SETTINGS_SERVICE.RAILWAY_PUBLIC_DOMAIN}}"
+
+# Database (shared across services)
+SUPABASE_URL = "${{SUPABASE_URL}}"
+SUPABASE_KEY = "${{SUPABASE_KEY}}"
+
+---
+# apps/api-gateway/requirements.txt
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+httpx==0.25.2
+python-multipart==0.0.6
+python-dotenv==1.0.0
+pydantic==2.5.0
+pydantic-settings==2.1.0
+PyJWT==2.8.0
+redis==5.0.1
+prometheus-client==0.19.0
+structlog==23.2.0
+
+# Optional monitoring
+sentry-sdk[fastapi]==1.38.0
+
+---
+# apps/api-gateway/.env.example
+# Gateway Configuration
+ENVIRONMENT=development
+DEBUG=true
+LOG_LEVEL=INFO
+SECRET_KEY=your-super-secret-key-change-in-production
+
+# CORS
+ALLOWED_ORIGINS=http://localhost:3000,http://localhost:3001
+
+# Rate Limiting  
+RATE_LIMIT_REQUESTS=1000
+REDIS_URL=redis://localhost:6379
+
+# Service URLs (for local development)
+OVERVIEW_SERVICE_URL=http://localhost:8001
+AGENTS_SERVICE_URL=http://localhost:8002
+SMART_CAMPAIGNS_SERVICE_URL=http://localhost:8003
+CALL_CENTER_SERVICE_URL=http://localhost:8004
+PHONE_NUMBERS_SERVICE_URL=http://localhost:8005
+VOICE_MARKETPLACE_SERVICE_URL=http://localhost:8006
+VOICE_LAB_SERVICE_URL=http://localhost:8007
+FLOW_BUILDER_SERVICE_URL=http://localhost:8008
+ANALYTICS_PRO_SERVICE_URL=http://localhost:8009
+AI_BRAIN_SERVICE_URL=http://localhost:8010
+INTEGRATIONS_SERVICE_URL=http://localhost:8011
+AGENT_STORE_SERVICE_URL=http://localhost:8012
+BILLING_PRO_SERVICE_URL=http://localhost:8013
+TEAM_HUB_SERVICE_URL=http://localhost:8014
+COMPLIANCE_SERVICE_URL=http://localhost:8015
+WHITE_LABEL_SERVICE_URL=http://localhost:8016
+DEVELOPER_API_SERVICE_URL=http://localhost:8017
+SETTINGS_SERVICE_URL=http://localhost:8018
+
+# Database
+SUPABASE_URL=your-supabase-url
+SUPABASE_KEY=your-supabase-key
+
+# Monitoring (optional)
+SENTRY_DSN=your-sentry-dsn
+
+---
+# apps/api-gateway/docker-compose.yml
+version: '3.8'
+
+services:
+  api-gateway:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=true
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - redis
+    volumes:
+      - ./src:/app/src
+      - ./shared:/app/shared
+    
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+
+volumes:
+  redis_data:

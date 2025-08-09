@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual env
+.venv/
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Real secrets file
+.env
+
+# Bytecode / build
+build/
+dist/
+*.egg-info/
+
+# VSCode
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test / coverage
+.coverage
+htmlcov/
+pytest_cache/
+
+# Logs
+*.log
+logs/
+
+# Cache
+.mypy_cache/
+.pytest_cache/
+.cache/
+
+# Node (dashboard)
+node_modules/
+
+# Docker artifacts
+**/.dockerignore.generated
+
+# Misc
+*.sqlite3

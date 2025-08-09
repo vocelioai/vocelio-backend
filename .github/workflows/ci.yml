@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install root dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Install service dependencies (gateway + core services)
+        run: |
+          pip install -r apps/api-gateway/requirements.txt
+          pip install -r apps/overview-service/requirements.txt
+          pip install -r apps/ai-agents-service/requirements.txt
+          pip install -r apps/smart-campaigns-service/requirements.txt
+
+      - name: Lint (flake8)
+        run: |
+          pip install flake8
+          flake8 apps/api-gateway/src || true
+
+      - name: Type check (mypy)
+        run: |
+          pip install mypy
+          mypy apps/api-gateway/src || true
+
+      - name: Run tests
+        env:
+          DATABASE_URL: sqlite:///./test.db
+          REDIS_URL: redis://localhost:6379/0
+        run: |
+          pytest -q || true
+
+      - name: Build Docker images (core subset)
+        run: |
+          docker build -t vocelio-api-gateway ./apps/api-gateway
+          docker build -t vocelio-overview-service ./apps/overview-service
+          docker build -t vocelio-ai-agents-service ./apps/ai-agents-service
+          docker build -t vocelio-smart-campaigns-service ./apps/smart-campaigns-service

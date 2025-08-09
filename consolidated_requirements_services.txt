@@ -1,0 +1,32 @@
+# Auto-generated consolidated service requirements (gateway + 3 core services)
+# Generated on 2025-08-09
+# Contains unique, pinned packages merged across:
+#  - apps/api-gateway/requirements.txt
+#  - apps/overview-service/requirements.txt
+#  - apps/ai-agents-service/requirements.txt
+#  - apps/smart-campaigns-service/requirements.txt
+
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+pydantic-settings==2.1.0
+python-multipart==0.0.6
+asyncpg==0.29.0
+redis[hiredis]==5.0.1
+httpx[http2]==0.25.2
+aiohttp==3.9.1
+websockets==12.0
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+cryptography>=41.0.0,<42.0.0
+PyJWT==2.8.0
+python-dotenv==1.0.0
+structlog==23.2.0
+backoff==2.2.1
+slowapi==0.1.9
+prometheus-client==0.19.0
+sentry-sdk[fastapi]==1.38.0
+gunicorn==21.2.0
+psutil==5.9.6
+pytest==7.4.3
+pytest-asyncio==0.21.1

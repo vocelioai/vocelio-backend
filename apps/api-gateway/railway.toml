@@ -1,0 +1,89 @@
+[build]
+builder = "NIXPACKS"
+
+[deploy]
+startCommand = "uvicorn apps.api-gateway.src.main:app --host 0.0.0.0 --port $PORT --workers 4"
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
+
+[environments.production.variables]
+# Application
+ENVIRONMENT = "production"
+LOG_LEVEL = "INFO"
+LOG_TO_FILE = "false"
+
+# Security
+JWT_SECRET_KEY = "${{Railway.JWT_SECRET_KEY}}"
+JWT_ALGORITHM = "HS256"
+JWT_EXPIRE_MINUTES = "1440"
+
+# CORS
+CORS_ORIGINS = "https://app.vocelio.ai,https://dashboard.vocelio.ai,https://api.vocelio.ai"
+
+# Database
+DATABASE_URL = "${{Railway.DATABASE_URL}}"
+SUPABASE_URL = "${{Railway.SUPABASE_URL}}"
+SUPABASE_SERVICE_KEY = "${{Railway.SUPABASE_SERVICE_KEY}}"
+
+# Redis
+REDIS_URL = "${{Railway.REDIS_URL}}"
+
+# External Services
+OPENAI_API_KEY = "${{Railway.OPENAI_API_KEY}}"
+ANTHROPIC_API_KEY = "${{Railway.ANTHROPIC_API_KEY}}"
+ELEVENLABS_API_KEY = "${{Railway.ELEVENLABS_API_KEY}}"
+TWILIO_ACCOUNT_SID = "${{Railway.TWILIO_ACCOUNT_SID}}"
+TWILIO_AUTH_TOKEN = "${{Railway.TWILIO_AUTH_TOKEN}}"
+
+# Service URLs - Internal Railway Network
+OVERVIEW_SERVICE_URL = "http://overview-service.railway.internal:8001"
+AI_AGENTS_SERVICE_URL = "http://ai-agents-service.railway.internal:8002"
+SMART_CAMPAIGNS_SERVICE_URL = "http://smart-campaigns-service.railway.internal:8003"
+CALL_CENTER_SERVICE_URL = "http://call-center-service.railway.internal:8004"
+VOICE_LAB_SERVICE_URL = "http://voice-lab-service.railway.internal:8005"
+ANALYTICS_SERVICE_URL = "http://analytics-service.railway.internal:8006"
+BILLING_SERVICE_URL = "http://billing-service.railway.internal:8007"
+INTEGRATIONS_SERVICE_URL = "http://integrations-service.railway.internal:8008"
+MARKETPLACE_SERVICE_URL = "http://marketplace-service.railway.internal:8009"
+LEAD_QUALIFICATION_SERVICE_URL = "http://lead-qualification-service.railway.internal:8010"
+APPOINTMENT_BOOKING_SERVICE_URL = "http://appointment-booking-service.railway.internal:8011"
+INBOUND_CALLS_SERVICE_URL = "http://inbound-calls-service.railway.internal:8012"
+OUTBOUND_CALLS_SERVICE_URL = "http://outbound-calls-service.railway.internal:8013"
+KNOWLEDGE_BASE_SERVICE_URL = "http://knowledge-base-service.railway.internal:8014"
+TEAM_MANAGEMENT_SERVICE_URL = "http://team-management-service.railway.internal:8015"
+WORKFLOWS_SERVICE_URL = "http://workflows-service.railway.internal:8016"
+DEVELOPER_API_SERVICE_URL = "http://developer-api-service.railway.internal:8017"
+WEBHOOKS_SERVICE_URL = "http://webhooks-service.railway.internal:8018"
+
+[environments.staging.variables]
+# Application
+ENVIRONMENT = "staging"
+LOG_LEVEL = "DEBUG"
+
+# Database
+DATABASE_URL = "${{Railway.STAGING_DATABASE_URL}}"
+SUPABASE_URL = "${{Railway.STAGING_SUPABASE_URL}}"
+SUPABASE_SERVICE_KEY = "${{Railway.STAGING_SUPABASE_SERVICE_KEY}}"
+
+# Redis
+REDIS_URL = "${{Railway.STAGING_REDIS_URL}}"
+
+# Service URLs - Staging
+OVERVIEW_SERVICE_URL = "http://overview-service-staging.railway.internal:8001"
+AI_AGENTS_SERVICE_URL = "http://ai-agents-service-staging.railway.internal:8002"
+SMART_CAMPAIGNS_SERVICE_URL = "http://smart-campaigns-service-staging.railway.internal:8003"
+CALL_CENTER_SERVICE_URL = "http://call-center-service-staging.railway.internal:8004"
+VOICE_LAB_SERVICE_URL = "http://voice-lab-service-staging.railway.internal:8005"
+ANALYTICS_SERVICE_URL = "http://analytics-service-staging.railway.internal:8006"
+BILLING_SERVICE_URL = "http://billing-service-staging.railway.internal:8007"
+INTEGRATIONS_SERVICE_URL = "http://integrations-service-staging.railway.internal:8008"
+MARKETPLACE_SERVICE_URL = "http://marketplace-service-staging.railway.internal:8009"
+LEAD_QUALIFICATION_SERVICE_URL = "http://lead-qualification-service-staging.railway.internal:8010"
+APPOINTMENT_BOOKING_SERVICE_URL = "http://appointment-booking-service-staging.railway.internal:8011"
+INBOUND_CALLS_SERVICE_URL = "http://inbound-calls-service-staging.railway.internal:8012"
+OUTBOUND_CALLS_SERVICE_URL = "http://outbound-calls-service-staging.railway.internal:8013"
+KNOWLEDGE_BASE_SERVICE_URL = "http://knowledge-base-service-staging.railway.internal:8014"
+TEAM_MANAGEMENT_SERVICE_URL = "http://team-management-service-staging.railway.internal:8015"
+WORKFLOWS_SERVICE_URL = "http://workflows-service-staging.railway.internal:8016"
+DEVELOPER_API_SERVICE_URL = "http://developer-api-service-staging.railway.internal:8017"
+WEBHOOKS_SERVICE_URL = "http://webhooks-service-staging.railway.internal:8018"

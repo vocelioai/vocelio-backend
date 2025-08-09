@@ -1,0 +1,98 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: vocelio-postgres
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: postgres
+      POSTGRES_DB: vocelio
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7
+    container_name: vocelio-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  overview-service:
+    build: ./apps/overview-service
+    container_name: overview-service
+    env_file: .env
+    environment:
+      PORT: 8001
+      POSTGRES_HOST: postgres
+      REDIS_HOST: redis
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8001:8001"
+
+  ai-agents-service:
+    build: ./apps/ai-agents-service
+    container_name: ai-agents-service
+    env_file: .env
+    environment:
+      PORT: 8002
+      POSTGRES_HOST: postgres
+      REDIS_HOST: redis
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8002:8002"
+
+  smart-campaigns-service:
+    build: ./apps/smart-campaigns-service
+    container_name: smart-campaigns-service
+    env_file: .env
+    environment:
+      PORT: 8003
+      POSTGRES_HOST: postgres
+      REDIS_HOST: redis
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8003:8003"
+
+  api-gateway:
+    build: ./apps/api-gateway
+    container_name: api-gateway
+    env_file: .env
+    environment:
+      PORT: 8000
+      POSTGRES_HOST: postgres
+      REDIS_HOST: redis
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      overview-service:
+        condition: service_started
+      ai-agents-service:
+        condition: service_started
+      smart-campaigns-service:
+        condition: service_started
+    ports:
+      - "8000:8000"
+
+volumes:
+  pgdata:

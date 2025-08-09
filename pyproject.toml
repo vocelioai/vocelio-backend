@@ -1,0 +1,32 @@
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+
+[tool.isort]
+profile = "black"
+line_length = 100
+combine_as_imports = true
+
+[tool.flake8]
+max-line-length = 100
+extend-ignore = ["E203","W503"]
+exclude = [".venv","build","dist","__pycache__"]
+
+[tool.mypy]
+python_version = "3.11"
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_unused_configs = true
+ignore_missing_imports = true
+exclude = [".venv"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+
+[tool.coverage.run]
+source = ["apps/api-gateway/src"]
+branch = true
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"

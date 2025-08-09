@@ -1,0 +1,352 @@
+"""
+Vocelio API Gateway Configuration
+World-class enterprise configuration with comprehensive settings
+"""
+
+import os
+from typing import List, Dict, Any
+from pydantic_settings import BaseSettings
+from pydantic import Field, validator
+
+
+class Settings(BaseSettings):
+    """Application settings with enterprise-grade configuration"""
+    
+    # Application
+    APP_NAME: str = "Vocelio API Gateway"
+    VERSION: str = "1.0.0"
+    ENVIRONMENT: str = Field(default="development", description="Environment: development, staging, production")
+    DEBUG: bool = Field(default=False, description="Debug mode")
+    
+    # Server
+    HOST: str = Field(default="0.0.0.0")
+    PORT: int = Field(default=8000)
+    WORKERS: int = Field(default=1)
+    
+    # Security
+    SECRET_KEY: str = Field(..., description="Application secret key")
+    JWT_SECRET_KEY: str = Field(..., description="JWT secret key")
+    JWT_ALGORITHM: str = Field(default="HS256")
+    JWT_EXPIRATION_HOURS: int = Field(default=24)
+    
+    # CORS
+    CORS_ORIGINS: List[str] = Field(
+        default=[
+            "http://localhost:3000",
+            "https://app.vocelio.ai",
+            "https://dashboard.vocelio.ai"
+        ]
+    )
+    ALLOWED_HOSTS: List[str] = Field(
+        default=["localhost", "127.0.0.1", "*.vocelio.ai", "*.railway.app"]
+    )
+    
+    # Database
+    DATABASE_URL: str = Field(..., description="PostgreSQL database URL")
+    DATABASE_POOL_SIZE: int = Field(default=20)
+    DATABASE_MAX_OVERFLOW: int = Field(default=0)
+    
+    # Redis
+    REDIS_URL: str = Field(default="redis://localhost:6379/0")
+    REDIS_MAX_CONNECTIONS: int = Field(default=100)
+    
+    # Rate Limiting
+    RATE_LIMIT_REQUESTS: int = Field(default=1000)
+    RATE_LIMIT_WINDOW: int = Field(default=3600)  # 1 hour
+    
+    # Service URLs (Microservices)
+    OVERVIEW_SERVICE_URL: str = Field(default="http://overview:8001")
+    AGENTS_SERVICE_URL: str = Field(default="http://agents:8002")
+    CAMPAIGNS_SERVICE_URL: str = Field(default="http://smart-campaigns:8003")
+    CALL_CENTER_SERVICE_URL: str = Field(default="http://call-center:8004")
+    PHONE_NUMBERS_SERVICE_URL: str = Field(default="http://phone-numbers:8005")
+    VOICE_MARKETPLACE_SERVICE_URL: str = Field(default="http://voice-marketplace:8006")
+    VOICE_LAB_SERVICE_URL: str = Field(default="http://voice-lab:8007")
+    FLOW_BUILDER_SERVICE_URL: str = Field(default="http://flow-builder:8008")
+    ANALYTICS_SERVICE_URL: str = Field(default="http://analytics-pro:8009")
+    AI_BRAIN_SERVICE_URL: str = Field(default="http://ai-brain:8010")
+    INTEGRATIONS_SERVICE_URL: str = Field(default="http://integrations:8011")
+    AGENT_STORE_SERVICE_URL: str = Field(default="http://agent-store:8012")
+    BILLING_SERVICE_URL: str = Field(default="http://billing-pro:8013")
+    TEAM_HUB_SERVICE_URL: str = Field(default="http://team-hub:8014")
+    COMPLIANCE_SERVICE_URL: str = Field(default="http://compliance:8015")
+    WHITE_LABEL_SERVICE_URL: str = Field(default="http://white-label:8016")
+    DEVELOPER_API_SERVICE_URL: str = Field(default="http://developer-api:8017")
+    SETTINGS_SERVICE_URL: str = Field(default="http://settings:8018")
+    
+    # External APIs
+    OPENAI_API_KEY: str = Field(..., description="OpenAI API key")
+    ANTHROPIC_API_KEY: str = Field(default="", description="Anthropic API key")
+    ELEVENLABS_API_KEY: str = Field(..., description="ElevenLabs API key")
+    
+    # Twilio
+    TWILIO_ACCOUNT_SID: str = Field(..., description="Twilio Account SID")
+    TWILIO_AUTH_TOKEN: str = Field(..., description="Twilio Auth Token")
+    TWILIO_PHONE_NUMBER: str = Field(..., description="Twilio Phone Number")
+    
+    # Supabase
+    SUPABASE_URL: str = Field(..., description="Supabase URL")
+    SUPABASE_SERVICE_KEY: str = Field(..., description="Supabase Service Key")
+    SUPABASE_JWT_SECRET: str = Field(..., description="Supabase JWT Secret")
+    
+    # Cloud Storage
+    AWS_ACCESS_KEY_ID: str = Field(default="")
+    AWS_SECRET_ACCESS_KEY: str = Field(default="")
+    AWS_REGION: str = Field(default="us-east-1")
+    S3_BUCKET: str = Field(default="vocelio-storage")
+    
+    # Payment Processing
+    STRIPE_SECRET_KEY: str = Field(default="")
+    STRIPE_PUBLISHABLE_KEY: str = Field(default="")
+    STRIPE_WEBHOOK_SECRET: str = Field(default="")
+    
+    # Monitoring & Logging
+    SENTRY_DSN: str = Field(default="")
+    LOG_LEVEL: str = Field(default="INFO")
+    ENABLE_METRICS: bool = Field(default=True)
+    
+    # Performance
+    REQUEST_TIMEOUT: int = Field(default=30)
+    MAX_REQUEST_SIZE: int = Field(default=16 * 1024 * 1024)  # 16MB
+    
+    # Features
+    ENABLE_WEBSOCKETS: bool = Field(default=True)
+    ENABLE_CACHING: bool = Field(default=True)
+    ENABLE_BACKGROUND_TASKS: bool = Field(default=True)
+    
+    # AI Configuration
+    DEFAULT_AI_MODEL: str = Field(default="gpt-4")
+    MAX_AI_TOKENS: int = Field(default=4000)
+    AI_TEMPERATURE: float = Field(default=0.7)
+    
+    # Voice Configuration
+    DEFAULT_VOICE_PROVIDER: str = Field(default="elevenlabs")
+    VOICE_CACHE_DURATION: int = Field(default=3600)  # 1 hour
+    
+    @validator("ENVIRONMENT")
+    def validate_environment(cls, v):
+        if v not in ["development", "staging", "production"]:
+            raise ValueError("Environment must be development, staging, or production")
+        return v
+    
+    @validator("CORS_ORIGINS", pre=True)
+    def parse_cors_origins(cls, v):
+        if isinstance(v, str):
+            return [url.strip() for url in v.split(",")]
+        return v
+    
+    @validator("ALLOWED_HOSTS", pre=True)
+    def parse_allowed_hosts(cls, v):
+        if isinstance(v, str):
+            return [host.strip() for host in v.split(",")]
+        return v
+    
+    class Config:
+        env_file = ".env"
+        case_sensitive = True
+
+
+# Create settings instance
+settings = Settings()
+
+
+class DatabaseConfig:
+    """Database configuration with connection pooling"""
+    
+    def __init__(self):
+        self.url = settings.DATABASE_URL
+        self.pool_size = settings.DATABASE_POOL_SIZE
+        self.max_overflow = settings.DATABASE_MAX_OVERFLOW
+        
+    def get_engine_config(self) -> Dict[str, Any]:
+        """Get SQLAlchemy engine configuration"""
+        return {
+            "url": self.url,
+            "pool_size": self.pool_size,
+            "max_overflow": self.max_overflow,
+            "pool_pre_ping": True,
+            "pool_recycle": 3600,
+            "echo": settings.DEBUG,
+        }
+
+
+class RedisConfig:
+    """Redis configuration for caching and sessions"""
+    
+    def __init__(self):
+        self.url = settings.REDIS_URL
+        self.max_connections = settings.REDIS_MAX_CONNECTIONS
+        
+    def get_connection_config(self) -> Dict[str, Any]:
+        """Get Redis connection configuration"""
+        return {
+            "url": self.url,
+            "max_connections": self.max_connections,
+            "retry_on_timeout": True,
+            "health_check_interval": 30,
+        }
+
+
+class ServiceConfig:
+    """Microservices configuration"""
+    
+    def __init__(self):
+        self.services = {
+            "overview": settings.OVERVIEW_SERVICE_URL,
+            "agents": settings.AGENTS_SERVICE_URL,
+            "smart-campaigns": settings.CAMPAIGNS_SERVICE_URL,
+            "call-center": settings.CALL_CENTER_SERVICE_URL,
+            "phone-numbers": settings.PHONE_NUMBERS_SERVICE_URL,
+            "voice-marketplace": settings.VOICE_MARKETPLACE_SERVICE_URL,
+            "voice-lab": settings.VOICE_LAB_SERVICE_URL,
+            "flow-builder": settings.FLOW_BUILDER_SERVICE_URL,
+            "analytics-pro": settings.ANALYTICS_SERVICE_URL,
+            "ai-brain": settings.AI_BRAIN_SERVICE_URL,
+            "integrations": settings.INTEGRATIONS_SERVICE_URL,
+            "agent-store": settings.AGENT_STORE_SERVICE_URL,
+            "billing-pro": settings.BILLING_SERVICE_URL,
+            "team-hub": settings.TEAM_HUB_SERVICE_URL,
+            "compliance": settings.COMPLIANCE_SERVICE_URL,
+            "white-label": settings.WHITE_LABEL_SERVICE_URL,
+            "developer-api": settings.DEVELOPER_API_SERVICE_URL,
+            "settings": settings.SETTINGS_SERVICE_URL,
+        }
+    
+    def get_service_url(self, service_name: str) -> str:
+        """Get service URL by name"""
+        return self.services.get(service_name, "")
+    
+    def get_all_services(self) -> Dict[str, str]:
+        """Get all service configurations"""
+        return self.services.copy()
+
+
+# Export configuration instances
+database_config = DatabaseConfig()
+redis_config = RedisConfig()
+service_config = ServiceConfig()
+        "retry_attempts": 3,
+        "health_check_path": "/health"
+    },
+    "call-center": {
+        "name": "Call Center",
+        "timeout": 60,  # Calls may take longer
+        "retry_attempts": 1,  # Don't retry calls
+        "health_check_path": "/health"
+    },
+    "phone-numbers": {
+        "name": "Phone Numbers",
+        "timeout": 20,
+        "retry_attempts": 2,
+        "health_check_path": "/health"
+    },
+    "voice-marketplace": {
+        "name": "Voice Marketplace",
+        "timeout": 30,
+        "retry_attempts": 2,
+        "health_check_path": "/health"
+    },
+    "voice-lab": {
+        "name": "Voice Lab",
+        "timeout": 120,  # Voice generation can be slow
+        "retry_attempts": 1,  # Don't retry expensive operations
+        "health_check_path": "/health"
+    },
+    "flow-builder": {
+        "name": "Flow Builder",
+        "timeout": 30,
+        "retry_attempts": 2,
+        "health_check_path": "/health"
+    },
+    "analytics-pro": {
+        "name": "Analytics Pro",
+        "timeout": 60,  # Analytics queries may be slow
+        "retry_attempts": 2,
+        "health_check_path": "/health"
+    },
+    "ai-brain": {
+        "name": "AI Brain",
+        "timeout": 60,  # AI processing can be slow
+        "retry_attempts": 1,  # Don't retry AI operations
+        "health_check_path": "/health"
+    },
+    "integrations": {
+        "name": "Integrations",
+        "timeout": 30,
+        "retry_attempts": 3,
+        "health_check_path": "/health"
+    },
+    "agent-store": {
+        "name": "Agent Store",
+        "timeout": 30,
+        "retry_attempts": 2,
+        "health_check_path": "/health"
+    },
+    "billing-pro": {
+        "name": "Billing Pro",
+        "timeout": 30,
+        "retry_attempts": 3,  # Billing is critical
+        "health_check_path": "/health"
+    },
+    "team-hub": {
+        "name": "Team Hub",
+        "timeout": 20,
+        "retry_attempts": 2,
+        "health_check_path": "/health"
+    },
+    "compliance": {
+        "name": "Compliance",
+        "timeout": 30,
+        "retry_attempts": 3,  # Compliance is critical
+        "health_check_path": "/health"
+    },
+    "white-label": {
+        "name": "White Label",
+        "timeout": 30,
+        "retry_attempts": 2,
+        "health_check_path": "/health"
+    },
+    "developer-api": {
+        "name": "Developer API",
+        "timeout": 20,
+        "retry_attempts": 2,
+        "health_check_path": "/health"
+    },
+    "settings": {
+        "name": "Settings",
+        "timeout": 20,
+        "retry_attempts": 2,
+        "health_check_path": "/health"
+    }
+}
+
+# Environment-specific overrides
+if settings.ENVIRONMENT == "production":
+    settings.DEBUG = False
+    settings.LOG_LEVEL = "WARNING"
+    settings.RATE_LIMIT_REQUESTS = 5000  # Higher limits in production
+elif settings.ENVIRONMENT == "staging":
+    settings.DEBUG = False
+    settings.LOG_LEVEL = "INFO"
+    settings.RATE_LIMIT_REQUESTS = 2000
+elif settings.ENVIRONMENT == "development":
+    settings.DEBUG = True
+    settings.LOG_LEVEL = "DEBUG"
+    settings.RATE_LIMIT_REQUESTS = 100  # Lower limits for development
+
+# Railway-specific configuration
+if settings.RAILWAY_ENVIRONMENT:
+    settings.ENVIRONMENT = settings.RAILWAY_ENVIRONMENT
+    settings.DEBUG = False
+    
+    # Railway uses dynamic ports
+    PORT = int(os.getenv("PORT", 8000))
+    
+    # Railway provides URLs in specific format
+    RAILWAY_STATIC_URL = os.getenv("RAILWAY_STATIC_URL")
+    if RAILWAY_STATIC_URL:
+        settings.ALLOWED_ORIGINS.append(f"https://{RAILWAY_STATIC_URL}")
+        settings.ALLOWED_ORIGINS.append(f"http://{RAILWAY_STATIC_URL}")
+
+# Export settings
+__all__ = ["settings", "SERVICE_CONFIG"]
