@@ -1,0 +1,31 @@
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+pydantic-settings==2.1.0
+
+# HTTP & API
+httpx[http2]==0.25.2
+requests==2.31.0
+
+# Security
+python-jose[cryptography]==3.3.0
+cryptography==41.0.8
+
+# Database
+sqlalchemy[asyncio]==2.0.23
+asyncpg==0.29.0
+
+# Storage & Files
+boto3==1.34.0
+aiofiles==23.2.1
+
+# Utilities
+python-dateutil==2.8.2
+python-dotenv==1.0.0
+structlog==23.2.0
+
+# Image processing
+pillow==10.1.0
+
+# Payment processing
+stripe==7.8.0
