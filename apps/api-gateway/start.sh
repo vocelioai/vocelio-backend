@@ -1,12 +1,8 @@
-#!/bin/bash
-
-# Vocelio API Gateway Startup Script
-# Creates necessary directories and starts the application
-
-echo "🚀 Starting Vocelio.ai API Gateway..."
-
-# Create logs directory if it doesn't exist
-mkdir -p logs
+#!/bin/sh
+# Startup script for api-gateway service
+PORT=${PORT:-8000}
+echo "🚀 Starting Vocelio.ai API Gateway on port $PORT..."
+exec uvicorn src.main:app --host 0.0.0.0 --port "$PORT"
 
 # Create temporary directory for uploads
 mkdir -p tmp/uploads

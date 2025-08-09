@@ -37,6 +37,9 @@ ENV PATH="/opt/venv/bin:$PATH"
 # Copy application code
 COPY . .
 
+# Make startup script executable
+RUN chmod +x start.sh
+
 # Runtime user for security
 RUN adduser --disabled-password --gecos '' appuser && chown -R appuser:appuser /app
 USER appuser
@@ -46,5 +49,5 @@ EXPOSE 8000
 # Simple healthcheck hitting gateway health endpoint
 HEALTHCHECK --interval=30s --timeout=5s --retries=3 CMD python -c "import httpx; httpx.get('http://localhost:8000/health')"
 
-# Start API Gateway (use --app-dir for hyphenated path safety if needed)
-CMD ["bash", "-c", "uvicorn --app-dir apps/api-gateway src.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+# Start API Gateway using startup script
+CMD ["./start.sh"]

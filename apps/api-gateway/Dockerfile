@@ -20,7 +20,10 @@ RUN python -m pip install --upgrade pip wheel setuptools \
 # App code
 COPY . /app
 
+# Make startup script executable  
+RUN chmod +x start.sh
+
 # Ensure package imports like "from src..." work
 ENV PYTHONPATH=/app:/app/src
 EXPOSE 8000
-CMD uvicorn src.main:app --host 0.0.0.0 --port ${PORT:-8000}
+CMD ["./start.sh"]
