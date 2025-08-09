@@ -1,5 +1,5 @@
-# Overview Service Dockerfile
-# Vocelio.ai Command Center Dashboard Service
+# Smart Campaigns Service Dockerfile
+# Vocelio.ai AI-Powered Campaign Automation Service
 
 FROM python:3.11-slim
 
@@ -24,28 +24,28 @@ RUN apt-get update \
 
 # Copy requirements first for better caching
 COPY requirements.txt .
+COPY constraints.txt .
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy shared libraries
-COPY ../shared /app/shared
-
 # Copy application code
-COPY src/ /app/src/
-COPY . /app/
+COPY . .
+
+# Make start script executable
+RUN chmod +x start.sh
 
 # Create non-root user
-RUN useradd --create-home --shell /bin/bash vocelio
-RUN chown -R vocelio:vocelio /app
-USER vocelio
+RUN adduser --disabled-password --gecos '' appuser
+RUN chown -R appuser:appuser /app
+USER appuser
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8000/health || exit 1
+    CMD curl -f http://localhost:8003/health || exit 1
 
 # Expose port
-EXPOSE 8000
+EXPOSE 8003
 
-# Run the application
-CMD ["python", "-m", "uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Start the application using start.sh script
+CMD ["./start.sh"]
