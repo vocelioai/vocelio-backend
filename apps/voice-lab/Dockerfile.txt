@@ -1,0 +1,360 @@
+# Voice Lab Service Dockerfile
+FROM python:3.11-slim
+
+# Set working directory
+WORKDIR /app
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/app \
+    PORT=8000
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libpq-dev \
+    libsndfile1 \
+    libsndfile1-dev \
+    ffmpeg \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements first for better Docker layer caching
+COPY requirements.txt .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY . .
+
+# Create necessary directories
+RUN mkdir -p static/voices static/previews static/clones static/tests \
+    static/generations static/cloning static/exports
+
+# Set permissions
+RUN chmod +x ./scripts/start.sh || echo "No start script found"
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:${PORT}/health || exit 1
+
+# Expose port
+EXPOSE ${PORT}
+
+# Start command
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+
+---
+
+# Railway Configuration (railway.toml)
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+startCommand = "uvicorn main:app --host 0.0.0.0 --port $PORT"
+healthcheckPath = "/health"
+healthcheckTimeout = 100
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
+
+[env]
+PORT = "8000"
+ENVIRONMENT = "production"
+PYTHONPATH = "/app"
+
+# Service-specific environment variables
+SERVICE_NAME = "voice-lab"
+API_V1_STR = "/api/v1"
+
+# Feature flags
+ENABLE_VOICE_CLONING = "true"
+ENABLE_BATCH_OPERATIONS = "true"
+ENABLE_ANALYTICS = "true"
+ENABLE_AB_TESTING = "true"
+
+# Performance settings
+WORKER_PROCESSES = "2"
+MAX_CONCURRENT_GENERATIONS = "10"
+GENERATION_TIMEOUT = "300"
+CLONING_TIMEOUT = "1800"
+
+# File limits
+MAX_FILE_SIZE = "10485760"
+MAX_TEXT_LENGTH = "5000"
+
+# Quality settings
+DEFAULT_QUALITY_THRESHOLD = "85.0"
+AUTO_OPTIMIZE_VOICES = "true"
+CACHE_GENERATED_AUDIO = "true"
+CACHE_DURATION_HOURS = "24"
+
+# Audio settings
+DEFAULT_SAMPLE_RATE = "22050"
+DEFAULT_BITRATE = "128"
+AUDIO_COMPRESSION_QUALITY = "5"
+
+# Rate limiting
+RATE_LIMIT_ENABLED = "true"
+RATE_LIMIT_REQUESTS = "100"
+RATE_LIMIT_WINDOW = "3600"
+
+# Monitoring
+LOG_LEVEL = "INFO"
+ENABLE_METRICS = "true"
+
+# Cost management
+DEFAULT_COST_PER_CHAR = "0.00018"
+PREMIUM_COST_MULTIPLIER = "1.5"
+CLONED_VOICE_COST_MULTIPLIER = "2.0"
+COST_ALERT_THRESHOLD = "100.0"
+
+---
+
+# Docker Compose for Local Development (docker-compose.yml)
+version: '3.8'
+
+services:
+  voice-lab:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8004:8000"
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=true
+      - DATABASE_URL=postgresql://postgres:password@db:5432/vocelio_voice_lab
+      - REDIS_URL=redis://redis:6379/4
+      - API_GATEWAY_URL=http://api-gateway:8000
+      - AI_BRAIN_SERVICE_URL=http://ai-brain:8000
+    volumes:
+      - ./static:/app/static
+      - ./logs:/app/logs
+    depends_on:
+      - db
+      - redis
+    networks:
+      - vocelio-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: vocelio_voice_lab
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data_voice_lab:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5436:5432"
+    networks:
+      - vocelio-network
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6383:6379"
+    volumes:
+      - redis_data_voice_lab:/data
+    command: redis-server --appendonly yes
+    networks:
+      - vocelio-network
+
+  # Background worker for processing
+  voice-lab-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - ENVIRONMENT=development
+      - DATABASE_URL=postgresql://postgres:password@db:5432/vocelio_voice_lab
+      - REDIS_URL=redis://redis:6379/4
+    command: celery -A services.tasks worker --loglevel=info
+    volumes:
+      - ./static:/app/static
+    depends_on:
+      - db
+      - redis
+    networks:
+      - vocelio-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data_voice_lab:
+  redis_data_voice_lab:
+
+networks:
+  vocelio-network:
+    external: true
+
+---
+
+# Start Script (scripts/start.sh)
+#!/bin/bash
+
+echo "🎙️ Starting Voice Lab Service..."
+
+# Wait for database to be ready
+echo "Waiting for database connection..."
+while ! pg_isready -h ${DATABASE_HOST:-db} -p ${DATABASE_PORT:-5432} -U ${DATABASE_USER:-postgres}; do
+  echo "Database not ready, waiting..."
+  sleep 2
+done
+
+echo "Database is ready!"
+
+# Run database migrations
+echo "Running database migrations..."
+alembic upgrade head
+
+# Create static directories
+echo "Creating static directories..."
+mkdir -p static/{voices,previews,clones,tests,generations,cloning,exports}
+
+# Start the application
+echo "Starting Voice Lab service on port ${PORT:-8000}..."
+
+if [ "$ENVIRONMENT" = "production" ]; then
+    # Production: Use Gunicorn
+    exec gunicorn main:app \
+        --bind 0.0.0.0:${PORT:-8000} \
+        --workers ${WORKER_PROCESSES:-2} \
+        --worker-class uvicorn.workers.UvicornWorker \
+        --timeout 300 \
+        --keep-alive 2 \
+        --max-requests 1000 \
+        --max-requests-jitter 100 \
+        --access-logfile - \
+        --error-logfile -
+else
+    # Development: Use Uvicorn with reload
+    exec uvicorn main:app \
+        --host 0.0.0.0 \
+        --port ${PORT:-8000} \
+        --reload \
+        --log-level debug
+fi
+
+---
+
+# GitHub Actions Workflow (.github/workflows/voice-lab.yml)
+name: Voice Lab Service CI/CD
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'apps/voice-lab/**'
+      - '.github/workflows/voice-lab.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/voice-lab/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_voice_lab
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libsndfile1 ffmpeg
+        
+    - name: Install dependencies
+      working-directory: ./apps/voice-lab
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        
+    - name: Run tests
+      working-directory: ./apps/voice-lab
+      run: |
+        pytest tests/ -v --cov=. --cov-report=xml
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_voice_lab
+        REDIS_URL: redis://localhost:6379/0
+        SECRET_KEY: test-secret-key
+        ELEVENLABS_API_KEY: test-key
+        OPENAI_API_KEY: test-key
+
+    - name: Upload coverage
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./apps/voice-lab/coverage.xml
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Deploy to Railway
+      uses: railway-app/railway@v1
+      with:
+        service: voice-lab
+        railway-token: ${{ secrets.RAILWAY_TOKEN }}
+        working-directory: ./apps/voice-lab
+
+---
+
+# Monitoring Configuration (monitoring/prometheus.yml)
+# Voice Lab Service Metrics
+- job_name: 'voice-lab'
+  static_configs:
+    - targets: ['voice-lab:9090']
+  metrics_path: '/metrics'
+  scrape_interval: 15s
+  scrape_timeout: 10s
+  
+  # Custom labels
+  relabel_configs:
+    - source_labels: [__address__]
+      target_label: service
+      replacement: voice-lab
+    - source_labels: [__address__]
+      target_label: environment
+      replacement: production

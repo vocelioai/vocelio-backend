@@ -1,0 +1,243 @@
+# Analytics Pro Service - Railway Configuration
+# 📊 Advanced Analytics & Business Intelligence Deployment
+
+[build]
+builder = "dockerfile"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+healthcheckPath = "/health"
+healthcheckTimeout = 30
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3
+
+[environments.production]
+# Service Configuration
+SERVICE_NAME = "analytics-pro"
+ENVIRONMENT = "production"
+PORT = "8006"
+WORKERS = "4"
+
+# Performance Settings
+CACHE_TTL_SECONDS = "300"
+REAL_TIME_UPDATE_INTERVAL = "3"
+MAX_QUERY_RANGE_DAYS = "90"
+QUERY_TIMEOUT_SECONDS = "15"
+
+# Security
+RATE_LIMIT_REQUESTS = "500"
+RATE_LIMIT_WINDOW = "3600"
+
+# Database Configuration (will be injected by Railway)
+# DATABASE_URL = "${{ Postgres.DATABASE_URL }}"
+DATABASE_POOL_SIZE = "10"
+DATABASE_MAX_OVERFLOW = "20"
+DATABASE_POOL_TIMEOUT = "30"
+
+# Redis Configuration (will be injected by Railway)
+# REDIS_URL = "${{ Redis.REDIS_URL }}"
+REDIS_POOL_SIZE = "10"
+REDIS_TIMEOUT = "5"
+
+# External Service URLs (Railway internal networking)
+API_GATEWAY_URL = "http://api-gateway.railway.internal:8000"
+CALL_CENTER_SERVICE_URL = "http://call-center.railway.internal:8001"
+AGENTS_SERVICE_URL = "http://agents.railway.internal:8002"
+CAMPAIGNS_SERVICE_URL = "http://smart-campaigns.railway.internal:8003"
+VOICE_LAB_SERVICE_URL = "http://voice-lab.railway.internal:8005"
+AI_BRAIN_SERVICE_URL = "http://ai-brain.railway.internal:8009"
+
+# CORS Configuration
+ALLOWED_ORIGINS = "https://app.vocelio.ai,https://vocelio.ai,https://*.vocelio.ai"
+ALLOWED_HOSTS = "*.vocelio.ai,*.railway.app"
+
+# Feature Flags
+ENABLE_AI_INSIGHTS = "true"
+ENABLE_REAL_TIME_UPDATES = "true"
+ENABLE_ADVANCED_ANALYTICS = "true"
+ENABLE_PREDICTIVE_ANALYTICS = "false"
+ENABLE_METRICS = "true"
+ENABLE_TRACING = "false"
+
+# Data Retention
+METRICS_RETENTION_DAYS = "90"
+AUDIT_LOG_RETENTION_DAYS = "365"
+EXPORT_FILE_RETENTION_DAYS = "7"
+REPORT_RETENTION_DAYS = "30"
+
+# Export & Reporting
+MAX_EXPORT_ROWS = "100000"
+EXPORT_TEMP_DIR = "/tmp/vocelio_exports"
+REPORT_GENERATION_TIMEOUT = "300"
+
+# Monitoring
+LOG_LEVEL = "INFO"
+LOG_FORMAT = "json"
+ENABLE_METRICS = "true"
+METRICS_PORT = "9090"
+
+# WebSocket Configuration
+WEBSOCKET_MAX_CONNECTIONS = "1000"
+WEBSOCKET_HEARTBEAT_INTERVAL = "30"
+
+# Mock Services (disabled in production)
+MOCK_EXTERNAL_SERVICES = "false"
+GENERATE_SAMPLE_DATA = "false"
+
+# File Storage (Railway Volumes)
+STORAGE_TYPE = "local"
+
+# Performance Tuning
+ASYNC_POOL_SIZE = "100"
+BULK_INSERT_BATCH_SIZE = "1000"
+CACHE_CLEANUP_INTERVAL_HOURS = "6"
+
+[environments.staging]
+# Inherit from production but with some overrides
+SERVICE_NAME = "analytics-pro-staging"
+ENVIRONMENT = "staging"
+PORT = "8006"
+WORKERS = "2"
+
+# Debug settings for staging
+LOG_LEVEL = "DEBUG"
+ENABLE_TRACING = "true"
+
+# Relaxed rate limiting for testing
+RATE_LIMIT_REQUESTS = "1000"
+
+# External Service URLs (staging environment)
+API_GATEWAY_URL = "http://api-gateway-staging.railway.internal:8000"
+CALL_CENTER_SERVICE_URL = "http://call-center-staging.railway.internal:8001"
+AGENTS_SERVICE_URL = "http://agents-staging.railway.internal:8002"
+CAMPAIGNS_SERVICE_URL = "http://smart-campaigns-staging.railway.internal:8003"
+VOICE_LAB_SERVICE_URL = "http://voice-lab-staging.railway.internal:8005"
+AI_BRAIN_SERVICE_URL = "http://ai-brain-staging.railway.internal:8009"
+
+# CORS for staging
+ALLOWED_ORIGINS = "https://staging.vocelio.ai,https://app-staging.vocelio.ai,http://localhost:3000"
+
+# Enable some development features
+GENERATE_SAMPLE_DATA = "true"
+ENABLE_PREDICTIVE_ANALYTICS = "true"
+
+[environments.development]
+SERVICE_NAME = "analytics-pro-dev"
+ENVIRONMENT = "development"
+DEBUG = "true"
+PORT = "8006"
+WORKERS = "1"
+
+# Development settings
+LOG_LEVEL = "DEBUG"
+CACHE_TTL_SECONDS = "60"
+MOCK_EXTERNAL_SERVICES = "true"
+GENERATE_SAMPLE_DATA = "true"
+
+# Local development URLs
+API_GATEWAY_URL = "http://localhost:8000"
+CALL_CENTER_SERVICE_URL = "http://localhost:8001"
+AGENTS_SERVICE_URL = "http://localhost:8002"
+CAMPAIGNS_SERVICE_URL = "http://localhost:8003"
+VOICE_LAB_SERVICE_URL = "http://localhost:8005"
+AI_BRAIN_SERVICE_URL = "http://localhost:8009"
+
+# CORS for development
+ALLOWED_ORIGINS = "http://localhost:3000,http://127.0.0.1:3000"
+ALLOWED_HOSTS = "localhost,127.0.0.1"
+
+# Development database (use Railway's if available, otherwise local)
+# DATABASE_URL = "sqlite:///./analytics_dev.db"
+REDIS_URL = "redis://localhost:6379/0"
+
+# Enable all features for development
+ENABLE_AI_INSIGHTS = "true"
+ENABLE_REAL_TIME_UPDATES = "true"
+ENABLE_ADVANCED_ANALYTICS = "true"
+ENABLE_PREDICTIVE_ANALYTICS = "true"
+ENABLE_METRICS = "true"
+ENABLE_TRACING = "true"
+
+# Shorter retention for development
+METRICS_RETENTION_DAYS = "7"
+AUDIT_LOG_RETENTION_DAYS = "30"
+EXPORT_FILE_RETENTION_DAYS = "1"
+
+# Resource Configuration
+[[services]]
+name = "analytics-pro"
+
+[services.resources]
+# Production resources
+memory = "2Gi"
+cpu = "1000m"
+
+[services.variables]
+# Environment variables will be loaded from above sections
+
+[[services.volumes]]
+name = "analytics-exports"
+path = "/app/exports"
+size = "10Gi"
+
+[[services.volumes]]
+name = "analytics-reports" 
+path = "/app/reports"
+size = "5Gi"
+
+[[services.volumes]]
+name = "analytics-logs"
+path = "/app/logs"
+size = "2Gi"
+
+# Health checks
+[services.healthcheck]
+path = "/health"
+interval = "30s"
+timeout = "10s"
+retries = 3
+
+# Service dependencies
+[services.dependencies]
+postgres = "required"
+redis = "required"
+
+# Auto-scaling configuration
+[services.scaling]
+min = 1
+max = 5
+target_cpu = 70
+target_memory = 80
+
+# Networking
+[services.networking]
+internal_port = 8006
+public = true
+
+# Cron jobs for maintenance
+[[services.crons]]
+name = "cleanup-old-data"
+schedule = "0 2 * * *"  # Daily at 2 AM
+command = "python -c 'from src.services.cleanup_service import cleanup_old_data; cleanup_old_data()'"
+
+[[services.crons]]
+name = "generate-daily-reports"
+schedule = "0 6 * * *"  # Daily at 6 AM
+command = "python -c 'from src.services.report_service import generate_daily_reports; generate_daily_reports()'"
+
+[[services.crons]]
+name = "cache-warmup"
+schedule = "*/30 * * * *"  # Every 30 minutes
+command = "python -c 'from src.services.cache_service import warmup_cache; warmup_cache()'"
+
+# Monitoring and observability
+[services.monitoring]
+enabled = true
+metrics_path = "/metrics"
+metrics_port = 9090
+
+# Logging
+[services.logging]
+level = "info"
+format = "json"
+retention = "7d"

@@ -1,0 +1,67 @@
+# apps/team-hub/railway.toml
+
+[build]
+builder = "dockerfile"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+startCommand = "uvicorn main:app --host 0.0.0.0 --port $PORT"
+healthcheckPath = "/health"
+healthcheckTimeout = 30
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3
+
+[env]
+# Service identification
+SERVICE_NAME = "team-hub"
+SERVICE_VERSION = "1.0.0"
+ENVIRONMENT = "production"
+
+# Server configuration
+PORT = "8008"
+HOST = "0.0.0.0"
+
+# Database - These will be injected by Railway
+# DATABASE_URL = "${{Postgres.DATABASE_URL}}"
+# REDIS_URL = "${{Redis.REDIS_URL}}"
+
+# Security
+# SECRET_KEY = "${{SECRET_KEY}}"
+# JWT_SECRET_KEY = "${{JWT_SECRET_KEY}}"
+
+# External service URLs (set these in Railway dashboard)
+# API_GATEWAY_URL = "${{API_GATEWAY_URL}}"
+# AI_BRAIN_SERVICE_URL = "${{AI_BRAIN_SERVICE_URL}}"
+# CALL_CENTER_SERVICE_URL = "${{CALL_CENTER_SERVICE_URL}}"
+# ANALYTICS_SERVICE_URL = "${{ANALYTICS_SERVICE_URL}}"
+
+# Email configuration
+# SMTP_HOST = "${{SMTP_HOST}}"
+# SMTP_PORT = "${{SMTP_PORT}}"
+# SMTP_USERNAME = "${{SMTP_USERNAME}}"
+# SMTP_PASSWORD = "${{SMTP_PASSWORD}}"
+# EMAIL_FROM = "${{EMAIL_FROM}}"
+
+# Monitoring
+# SENTRY_DSN = "${{SENTRY_DSN}}"
+
+# Feature flags
+ENABLE_REAL_TIME_UPDATES = "true"
+ENABLE_PERFORMANCE_TRACKING = "true"
+ENABLE_NOTIFICATIONS = "true"
+ENABLE_AUDIT_LOGGING = "true"
+METRICS_ENABLED = "true"
+
+# Performance settings
+MAX_TEAM_MEMBERS_PER_PAGE = "50"
+MAX_DEPARTMENTS_PER_ORG = "100"
+CACHE_TTL_SECONDS = "300"
+RATE_LIMIT_PER_MINUTE = "60"
+RATE_LIMIT_BURST = "10"
+
+# File upload settings
+MAX_FILE_SIZE = "10485760"  # 10MB in bytes
+UPLOAD_DIR = "uploads"
+
+[build.env]
+PYTHON_VERSION = "3.11"

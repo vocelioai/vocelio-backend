@@ -1,0 +1,143 @@
+# Railway.toml for Overview Service
+# Vocelio.ai Command Center Dashboard Service Deployment
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+healthcheckPath = "/health"
+healthcheckTimeout = 30
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
+
+[env]
+# Service Configuration
+SERVICE_NAME = "vocelio-overview"
+SERVICE_VERSION = "1.0.0"
+ENVIRONMENT = "production"
+
+# Server Configuration
+HOST = "0.0.0.0"
+PORT = "8000"
+DEBUG = "false"
+
+# Database Configuration
+SUPABASE_URL = "${{SUPABASE_URL}}"
+SUPABASE_ANON_KEY = "${{SUPABASE_ANON_KEY}}"
+SUPABASE_SERVICE_KEY = "${{SUPABASE_SERVICE_KEY}}"
+
+# Authentication
+SECRET_KEY = "${{SECRET_KEY}}"
+ACCESS_TOKEN_EXPIRE_MINUTES = "30"
+
+# External Services
+AI_BRAIN_SERVICE_URL = "${{AI_BRAIN_SERVICE_URL}}"
+CALL_CENTER_SERVICE_URL = "${{CALL_CENTER_SERVICE_URL}}"
+VOICE_LAB_SERVICE_URL = "${{VOICE_LAB_SERVICE_URL}}"
+ANALYTICS_SERVICE_URL = "${{ANALYTICS_SERVICE_URL}}"
+BILLING_SERVICE_URL = "${{BILLING_SERVICE_URL}}"
+
+# Caching
+REDIS_URL = "${{REDIS_URL}}"
+CACHE_TTL_SECONDS = "300"
+LIVE_METRICS_CACHE_TTL = "2"
+
+# Real-time Configuration
+ENABLE_REAL_TIME_UPDATES = "true"
+METRICS_UPDATE_INTERVAL = "2"
+WEBSOCKET_ENABLED = "true"
+
+# Performance Monitoring
+ENABLE_METRICS_COLLECTION = "true"
+HEALTH_CHECK_INTERVAL = "30"
+
+# Logging
+LOG_LEVEL = "INFO"
+ENABLE_JSON_LOGGING = "true"
+
+# CORS Configuration (Production URLs)
+ALLOWED_ORIGINS = "https://vocelio.ai,https://app.vocelio.ai,https://*.vocelio.ai"
+ALLOW_CREDENTIALS = "true"
+
+# Rate Limiting
+RATE_LIMIT_ENABLED = "true"
+RATE_LIMIT_REQUESTS = "1000"
+RATE_LIMIT_WINDOW = "3600"
+
+# AI Configuration
+AI_INSIGHTS_ENABLED = "true"
+AI_CONFIDENCE_THRESHOLD = "0.7"
+PREDICTIVE_ANALYTICS_ENABLED = "true"
+
+# Security
+REQUIRE_HTTPS = "true"
+SECURITY_HEADERS_ENABLED = "true"
+
+# Feature Flags
+ENABLE_GLOBAL_METRICS = "true"
+ENABLE_PREDICTIVE_INSIGHTS = "true"
+ENABLE_REAL_TIME_ALERTS = "true"
+ENABLE_CUSTOM_METRICS = "true"
+
+# Monitoring
+SENTRY_DSN = "${{SENTRY_DSN}}"
+
+[build.args]
+# Build arguments if needed
+PYTHON_VERSION = "3.11"
+
+[healthcheck]
+path = "/health"
+interval = 30
+timeout = 10
+retries = 3
+
+[scaling]
+# Railway autoscaling configuration
+minReplicas = 1
+maxReplicas = 5
+targetCPU = 70
+targetMemory = 80
+
+[resources]
+# Resource allocation
+memory = "1Gi"
+cpu = "1000m"
+
+[networking]
+# Internal networking
+internalPort = 8000
+publicPort = 443
+protocol = "HTTP"
+
+[volumes]
+# Persistent storage for exports and logs
+- mountPath = "/app/exports"
+  size = "10Gi"
+  name = "exports-storage"
+
+[secrets]
+# Environment-specific secrets (managed in Railway dashboard)
+- name = "SUPABASE_URL"
+  description = "Supabase database URL"
+- name = "SUPABASE_ANON_KEY" 
+  description = "Supabase anonymous key"
+- name = "SUPABASE_SERVICE_KEY"
+  description = "Supabase service role key"
+- name = "SECRET_KEY"
+  description = "JWT secret key for authentication"
+- name = "REDIS_URL"
+  description = "Redis cache URL"
+- name = "SENTRY_DSN"
+  description = "Sentry error tracking DSN"
+- name = "AI_BRAIN_SERVICE_URL"
+  description = "AI Brain service internal URL"
+- name = "CALL_CENTER_SERVICE_URL"
+  description = "Call Center service internal URL"
+- name = "VOICE_LAB_SERVICE_URL"
+  description = "Voice Lab service internal URL"
+- name = "ANALYTICS_SERVICE_URL"
+  description = "Analytics service internal URL"
+- name = "BILLING_SERVICE_URL"
+  description = "Billing service internal URL"

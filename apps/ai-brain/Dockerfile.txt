@@ -1,0 +1,89 @@
+# AI Brain Service Dockerfile
+# Production-optimized container for Vocelio.ai AI Brain microservice
+
+FROM python:3.11-slim as base
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONHASHSEED=random \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user
+RUN groupadd -r aiuser && useradd -r -g aiuser aiuser
+
+# Set work directory
+WORKDIR /app
+
+# Copy requirements first for better caching
+COPY requirements.txt .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy shared libraries
+COPY shared/ ./shared/
+
+# Copy application code
+COPY src/ ./src/
+COPY main.py .
+
+# Create necessary directories
+RUN mkdir -p /app/logs /app/data /app/models && \
+    chown -R aiuser:aiuser /app
+
+# Switch to non-root user
+USER aiuser
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:8007/health || exit 1
+
+# Expose port
+EXPOSE 8007
+
+# Production command
+CMD ["gunicorn", "main:app", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "-b", "0.0.0.0:8007", "--timeout", "300", "--keep-alive", "5", "--max-requests", "1000", "--max-requests-jitter", "100"]
+
+# Development stage
+FROM base as development
+
+# Install development dependencies
+COPY requirements-dev.txt .
+RUN pip install --no-cache-dir -r requirements-dev.txt
+
+# Development command
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8007", "--reload", "--log-level", "debug"]
+
+# Production stage
+FROM base as production
+
+# Copy production configuration
+COPY railway.toml .
+
+# Set production environment
+ENV ENVIRONMENT=production \
+    LOG_LEVEL=INFO \
+    WORKERS=4
+
+# Final production command with optimizations
+CMD ["gunicorn", "main:app", \
+     "-w", "4", \
+     "-k", "uvicorn.workers.UvicornWorker", \
+     "-b", "0.0.0.0:8007", \
+     "--timeout", "300", \
+     "--keep-alive", "5", \
+     "--max-requests", "1000", \
+     "--max-requests-jitter", "100", \
+     "--worker-connections", "1000", \
+     "--preload", \
+     "--access-logfile", "-", \
+     "--error-logfile", "-"]

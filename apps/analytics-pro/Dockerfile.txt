@@ -1,0 +1,59 @@
+# Analytics Pro Service Dockerfile
+# 📊 Advanced Analytics & Business Intelligence Microservice
+
+FROM python:3.11-slim as base
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# Create application user
+RUN groupadd -r vocelio && useradd -r -g vocelio vocelio
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    libpq-dev \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set work directory
+WORKDIR /app
+
+# Copy requirements first for better caching
+COPY requirements.txt .
+
+# Install Python dependencies
+RUN pip install --upgrade pip && \
+    pip install -r requirements.txt
+
+# Copy shared libraries
+COPY shared/ ./shared/
+
+# Copy application code
+COPY src/ ./src/
+COPY main.py .
+
+# Copy configuration files
+COPY railway.toml .
+COPY pyproject.toml .
+
+# Create necessary directories
+RUN mkdir -p /app/logs /app/exports /app/reports && \
+    chown -R vocelio:vocelio /app
+
+# Switch to non-root user
+USER vocelio
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8006/health || exit 1
+
+# Expose port
+EXPOSE 8006
+
+# Command to run the application
+CMD ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8006", "--workers", "1"]

@@ -1,0 +1,177 @@
+# apps/phone-numbers/requirements.txt
+# FastAPI and ASGI
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+pydantic-settings==2.1.0
+
+# Database
+sqlalchemy==2.0.23
+alembic==1.13.1
+psycopg2-binary==2.9.9
+
+# External APIs
+twilio==8.10.0
+stripe==7.8.0
+phonenumbers==8.13.25
+
+# HTTP and networking
+httpx==0.25.2
+aiofiles==23.2.1
+python-multipart==0.0.6
+
+# Authentication and security
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.6
+
+# Utilities
+python-dotenv==1.0.0
+email-validator==2.1.0
+redis==5.0.1
+
+# Monitoring and logging
+structlog==23.2.0
+prometheus-client==0.19.0
+
+# Testing (dev dependencies)
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+httpx==0.25.2  # For testing
+
+---
+
+# apps/phone-numbers/Dockerfile
+FROM python:3.11-slim
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV PATH="/root/.local/bin:$PATH"
+
+# Set work directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        build-essential \
+        curl \
+        libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY src/ ./src/
+COPY ../shared/ ./shared/
+
+# Create non-root user
+RUN adduser --disabled-password --gecos '' appuser \
+    && chown -R appuser:appuser /app
+USER appuser
+
+# Expose port
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+# Run the application
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
+
+---
+
+# apps/phone-numbers/railway.toml
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+numReplicas = 1
+sleepApplication = false
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
+
+[env]
+PORT = "8000"
+PYTHONPATH = "/app"
+
+# Service will get these from Railway secrets
+# DATABASE_URL = "${{Postgres.DATABASE_URL}}"
+# TWILIO_ACCOUNT_SID = "${{TWILIO_ACCOUNT_SID}}"
+# TWILIO_AUTH_TOKEN = "${{TWILIO_AUTH_TOKEN}}"
+# STRIPE_SECRET_KEY = "${{STRIPE_SECRET_KEY}}"
+# SECRET_KEY = "${{SECRET_KEY}}"
+
+[healthcheck]
+path = "/health"
+timeout = 10
+interval = 60
+
+[scaling]
+minReplicas = 1
+maxReplicas = 10
+targetCPU = 80
+targetMemory = 80
+
+---
+
+# apps/phone-numbers/.env.example
+# Service Configuration
+SERVICE_URL=http://localhost:8000
+DEBUG=True
+ENVIRONMENT=development
+SERVICE_NAME=phone-numbers
+
+# Database Configuration
+DATABASE_URL=postgresql://user:password@localhost:5432/vocelio_phone_numbers
+DATABASE_POOL_SIZE=10
+DATABASE_MAX_OVERFLOW=20
+
+# Twilio Configuration
+TWILIO_ACCOUNT_SID=your_twilio_account_sid
+TWILIO_AUTH_TOKEN=your_twilio_auth_token
+TWILIO_WEBHOOK_URL=https://api.vocelio.ai/phone-numbers/api/v1/webhooks/twilio
+
+# Stripe Configuration
+STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
+STRIPE_PUBLISHABLE_KEY=pk_test_your_stripe_publishable_key
+STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret
+STRIPE_LIVE_MODE=False
+
+# Security Configuration
+SECRET_KEY=your-super-secret-key-here
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+
+# CORS Configuration
+ALLOWED_HOSTS=["http://localhost:3000","https://vocelio.ai","https://*.vocelio.ai"]
+
+# Rate Limiting
+RATE_LIMIT_REQUESTS=100
+RATE_LIMIT_WINDOW=60
+
+# Service Discovery
+API_GATEWAY_URL=http://localhost:8080
+BILLING_SERVICE_URL=http://localhost:8007
+COMPLIANCE_SERVICE_URL=http://localhost:8010
+
+# Phone Number Configuration
+DEFAULT_VOICE_URL=https://api.vocelio.ai/voice/webhook
+DEFAULT_SMS_URL=https://api.vocelio.ai/sms/webhook
+MAX_SEARCH_RESULTS=50
+SEARCH_TIMEOUT=30
+
+# Logging Configuration
+LOG_LEVEL=INFO
+LOG_FORMAT="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+# Redis Configuration (optional)
+REDIS_URL=redis://localhost:6379/0
+CACHE_TTL=300

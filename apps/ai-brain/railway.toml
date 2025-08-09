@@ -1,0 +1,203 @@
+# Railway.toml - AI Brain Service Configuration
+# Production deployment configuration for Railway
+
+[build]
+builder = "dockerfile"
+dockerfile = "Dockerfile"
+
+[deploy]
+startCommand = "gunicorn main:app -w 4 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:$PORT --timeout 300 --keep-alive 5"
+healthcheckPath = "/health"
+healthcheckTimeout = 30
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3
+
+# Resource allocation
+[deploy.resources]
+memory = "2GB"
+vCPUs = 2
+
+# Environment variables
+[env]
+# Service configuration
+SERVICE_NAME = "ai-brain"
+SERVICE_VERSION = "1.0.0"
+ENVIRONMENT = "production"
+PORT = "$PORT"
+
+# Database configuration (Railway PostgreSQL)
+DATABASE_URL = "$DATABASE_URL"
+DATABASE_POOL_SIZE = "20"
+DATABASE_MAX_OVERFLOW = "30"
+
+# OpenAI configuration
+OPENAI_API_KEY = "$OPENAI_API_KEY"
+OPENAI_MODEL = "gpt-4-turbo"
+OPENAI_MAX_TOKENS = "2000"
+OPENAI_TEMPERATURE = "0.7"
+OPENAI_TIMEOUT = "30"
+
+# Redis configuration (Railway Redis)
+REDIS_URL = "$REDIS_URL"
+REDIS_PASSWORD = "$REDIS_PASSWORD"
+REDIS_DB = "0"
+CACHE_TTL_SECONDS = "3600"
+
+# AI configuration
+MAX_CONVERSATION_HISTORY = "50"
+CONFIDENCE_THRESHOLD = "0.8"
+OPTIMIZATION_THRESHOLD = "0.85"
+REAL_TIME_OPTIMIZATION = "true"
+OPTIMIZATION_INTERVAL = "30"
+BATCH_PROCESSING_ENABLED = "true"
+MAX_CONCURRENT_OPTIMIZATIONS = "10"
+
+# Machine learning
+ML_MODEL_UPDATE_FREQUENCY = "daily"
+AUTO_RETRAIN_ENABLED = "true"
+MODEL_PERFORMANCE_THRESHOLD = "0.9"
+
+# Analytics and monitoring
+ANALYTICS_ENABLED = "true"
+METRICS_COLLECTION_INTERVAL = "60"
+PERFORMANCE_MONITORING = "true"
+
+# Security
+JWT_SECRET_KEY = "$JWT_SECRET_KEY"
+JWT_ALGORITHM = "HS256"
+JWT_EXPIRATION_HOURS = "24"
+
+# Rate limiting
+RATE_LIMIT_ENABLED = "true"
+REQUESTS_PER_MINUTE = "100"
+BURST_LIMIT = "200"
+
+# External service URLs
+API_GATEWAY_URL = "$API_GATEWAY_URL"
+VOICE_LAB_URL = "$VOICE_LAB_URL"
+CALL_CENTER_URL = "$CALL_CENTER_URL"
+ANALYTICS_PRO_URL = "$ANALYTICS_PRO_URL"
+
+# Logging
+LOG_LEVEL = "INFO"
+STRUCTURED_LOGGING = "true"
+LOG_TO_FILE = "false"
+
+# Error handling
+MAX_RETRIES = "3"
+RETRY_DELAY_SECONDS = "1"
+CIRCUIT_BREAKER_ENABLED = "true"
+
+# Feature flags
+EXPERIMENTAL_FEATURES = "false"
+ADVANCED_ANALYTICS = "true"
+REAL_TIME_INSIGHTS = "true"
+AUTO_OPTIMIZATION = "true"
+
+# Performance tuning
+WORKER_PROCESSES = "4"
+MAX_REQUEST_SIZE = "10485760"
+REQUEST_TIMEOUT = "300"
+
+# Security hosts
+ALLOWED_HOSTS = "vocelio.ai,*.vocelio.ai,*.railway.app"
+CORS_ORIGINS = "https://vocelio.ai,https://*.vocelio.ai,https://*.railway.app"
+
+# Monitoring integrations
+SENTRY_DSN = "$SENTRY_DSN"
+PROMETHEUS_ENABLED = "true"
+
+[build.env]
+# Build-time environment variables
+PYTHON_VERSION = "3.11"
+PIP_INDEX_URL = "https://pypi.org/simple"
+
+# Railway-specific configurations
+[railway]
+# Service metadata
+name = "ai-brain"
+description = "🧠 Advanced AI Processing Engine for Vocelio.ai"
+icon = "brain"
+
+# Networking
+[railway.networking]
+# Internal service communication
+internal = true
+# External access for API endpoints
+external = true
+
+# Scaling configuration
+[railway.scaling]
+# Horizontal scaling
+minReplicas = 1
+maxReplicas = 5
+# CPU-based autoscaling
+targetCPUUtilization = 70
+# Memory-based autoscaling  
+targetMemoryUtilization = 80
+
+# Health monitoring
+[railway.healthcheck]
+path = "/health"
+intervalSeconds = 30
+timeoutSeconds = 10
+failureThreshold = 3
+successThreshold = 1
+
+# Service dependencies
+[railway.dependencies]
+# Required services
+database = "postgresql"
+cache = "redis"
+# Optional monitoring
+monitoring = "prometheus"
+
+# Backup and recovery
+[railway.backup]
+enabled = true
+schedule = "0 2 * * *"  # Daily at 2 AM UTC
+retention = "30d"
+
+# Alerts and notifications
+[railway.alerts]
+# Performance alerts
+cpu_threshold = 85
+memory_threshold = 90
+error_rate_threshold = 5
+# Response time alerts
+response_time_threshold = 1000
+
+# Security settings
+[railway.security]
+# Network policies
+networkPolicies = ["internal-only", "api-gateway-access"]
+# Secrets management
+secretsProvider = "railway"
+# SSL/TLS
+tlsEnabled = true
+tlsMinVersion = "1.2"
+
+# Development environment overrides
+[env.development]
+LOG_LEVEL = "DEBUG"
+DEBUG_MODE = "true"
+ENABLE_DOCS = "true"
+RELOAD_ON_CHANGE = "true"
+WORKER_PROCESSES = "2"
+REAL_TIME_OPTIMIZATION = "false"  # Reduce load in dev
+
+# Staging environment overrides
+[env.staging]
+LOG_LEVEL = "INFO"
+DEBUG_MODE = "false"
+ENABLE_DOCS = "true"
+WORKER_PROCESSES = "4"
+EXPERIMENTAL_FEATURES = "true"  # Test new features in staging
+
+# Production environment (default values above)
+[env.production]
+LOG_LEVEL = "WARNING"
+DEBUG_MODE = "false"
+ENABLE_DOCS = "false"
+WORKER_PROCESSES = "8"
+EXPERIMENTAL_FEATURES = "false"

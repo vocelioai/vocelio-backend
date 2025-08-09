@@ -1,0 +1,147 @@
+# apps/flow-builder/railway.toml
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+healthcheckPath = "/health"
+healthcheckTimeout = 30
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
+
+[[deploy.environmentVariables]]
+name = "ENVIRONMENT"
+value = "production"
+
+[[deploy.environmentVariables]]
+name = "PORT"
+value = "8000"
+
+[[deploy.environmentVariables]]
+name = "LOG_LEVEL"
+value = "INFO"
+
+[[deploy.environmentVariables]]
+name = "ENABLE_METRICS"
+value = "true"
+
+# Database Configuration
+[[deploy.environmentVariables]]
+name = "DATABASE_URL"
+value = "${{Postgres.DATABASE_URL}}"
+
+[[deploy.environmentVariables]]
+name = "SUPABASE_URL"
+value = "${{SUPABASE_URL}}"
+
+[[deploy.environmentVariables]]
+name = "SUPABASE_ANON_KEY"
+value = "${{SUPABASE_ANON_KEY}}"
+
+[[deploy.environmentVariables]]
+name = "SUPABASE_SERVICE_ROLE_KEY"
+value = "${{SUPABASE_SERVICE_ROLE_KEY}}"
+
+# Authentication
+[[deploy.environmentVariables]]
+name = "JWT_SECRET_KEY"
+value = "${{JWT_SECRET_KEY}}"
+
+[[deploy.environmentVariables]]
+name = "JWT_ALGORITHM"
+value = "HS256"
+
+[[deploy.environmentVariables]]
+name = "ACCESS_TOKEN_EXPIRE_MINUTES"
+value = "60"
+
+# External API Keys
+[[deploy.environmentVariables]]
+name = "OPENAI_API_KEY"
+value = "${{OPENAI_API_KEY}}"
+
+[[deploy.environmentVariables]]
+name = "ANTHROPIC_API_KEY"
+value = "${{ANTHROPIC_API_KEY}}"
+
+[[deploy.environmentVariables]]
+name = "ELEVENLABS_API_KEY"
+value = "${{ELEVENLABS_API_KEY}}"
+
+[[deploy.environmentVariables]]
+name = "TWILIO_ACCOUNT_SID"
+value = "${{TWILIO_ACCOUNT_SID}}"
+
+[[deploy.environmentVariables]]
+name = "TWILIO_AUTH_TOKEN"
+value = "${{TWILIO_AUTH_TOKEN}}"
+
+# Service URLs
+[[deploy.environmentVariables]]
+name = "API_GATEWAY_URL"
+value = "${{API_GATEWAY_URL}}"
+
+[[deploy.environmentVariables]]
+name = "AI_BRAIN_SERVICE_URL"
+value = "${{AI_BRAIN_SERVICE_URL}}"
+
+[[deploy.environmentVariables]]
+name = "VOICE_LAB_SERVICE_URL"
+value = "${{VOICE_LAB_SERVICE_URL}}"
+
+[[deploy.environmentVariables]]
+name = "CALL_CENTER_SERVICE_URL"
+value = "${{CALL_CENTER_SERVICE_URL}}"
+
+# Flow Builder Configuration
+[[deploy.environmentVariables]]
+name = "MAX_FLOW_NODES"
+value = "100"
+
+[[deploy.environmentVariables]]
+name = "MAX_EXECUTION_TIME"
+value = "300"
+
+[[deploy.environmentVariables]]
+name = "MAX_CONCURRENT_EXECUTIONS"
+value = "10"
+
+# CORS Configuration
+[[deploy.environmentVariables]]
+name = "CORS_ORIGINS"
+value = "${{CORS_ORIGINS}}"
+
+[[deploy.environmentVariables]]
+name = "CORS_METHODS"
+value = "*"
+
+[[deploy.environmentVariables]]
+name = "CORS_HEADERS"
+value = "*"
+
+# Rate Limiting
+[[deploy.environmentVariables]]
+name = "RATE_LIMIT_REQUESTS"
+value = "100"
+
+[[deploy.environmentVariables]]
+name = "RATE_LIMIT_WINDOW"
+value = "60"
+
+# Cache Configuration
+[[deploy.environmentVariables]]
+name = "REDIS_URL"
+value = "${{Redis.REDIS_URL}}"
+
+[[deploy.environmentVariables]]
+name = "CACHE_TTL"
+value = "3600"
+
+[environments.production]
+variables = { }
+
+[environments.staging]
+variables = { 
+  ENVIRONMENT = "staging",
+  LOG_LEVEL = "DEBUG"
+}
