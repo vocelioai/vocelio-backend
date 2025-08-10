@@ -1,24 +1,25 @@
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
-pydantic==2.5.0
+ -c ../../constraints.txt
+fastapi
+uvicorn[standard]
+pydantic
 pydantic-settings==2.1.0
 
 # HTTP & API
-httpx[http2]==0.25.2
+httpx[http2]
 requests==2.31.0
 
 # Security
-python-jose[cryptography]==3.3.0
-cryptography==41.0.8
+python-jose[cryptography]
+cryptography
 
 # Database
-sqlalchemy[asyncio]==2.0.23
-asyncpg==0.29.0
+sqlalchemy[asyncio]
+asyncpg
 
 # Utilities
 python-dateutil==2.8.2
-python-dotenv==1.0.0
-structlog==23.2.0
+python-dotenv
+structlog
 
 # SDK Generation
 jinja2==3.1.2

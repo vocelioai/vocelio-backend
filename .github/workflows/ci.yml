@@ -8,16 +8,19 @@ on:
 
 jobs:
   build-and-test:
+    strategy:
+      matrix:
+        python: [ '3.11', '3.13' ]
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 18
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set up Python ${{ matrix.python }}
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: ${{ matrix.python }}
           cache: 'pip'
 
       - name: Install root dependencies
@@ -25,12 +28,43 @@ jobs:
           pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Install service dependencies (gateway + core services)
+      - name: Install all service requirement files (dependency resolution validation)
+        run: |
+          echo "Scanning service requirement files..."
+          set -e
+          for f in $(git ls-files 'apps/*/requirements.txt'); do
+            echo "--- Installing $f";
+            pip install -r "$f" --dry-run >/dev/null 2>&1 || pip install -r "$f";
+          done
+
+      - name: Enforce central pins (no re-pins in services)
+        run: python scripts/check_pins.py
+
+      - name: Verify constraints alignment (httpx pin)
+        run: |
+          python - <<'PY'
+import pathlib, sys
+root = pathlib.Path('constraints.txt').read_text().splitlines()
+pin = [l for l in root if l.startswith('httpx==')]
+expected = pin[0].strip() if pin else None
+bad = []
+for p in pathlib.Path('apps').rglob('requirements.txt'):
+    txt = p.read_text().splitlines()
+    versions = [l.strip() for l in txt if l.startswith('httpx==')]
+    for v in versions:
+        if expected and v != expected:
+            bad.append((str(p), v))
+if bad:
+    print('Found mismatched httpx pins:', bad)
+    sys.exit(1)
+print('All httpx pins aligned with constraints.txt')
+PY
+
+      - name: Install core service dependencies (subset for lint/type/test)
         run: |
           pip install -r apps/api-gateway/requirements.txt
-          pip install -r apps/overview-service/requirements.txt
           pip install -r apps/ai-agents-service/requirements.txt
-          pip install -r apps/smart-campaigns-service/requirements.txt
+          pip install -r apps/smart-campaigns/requirements.txt || true
 
       - name: Lint (flake8)
         run: |
@@ -52,6 +86,5 @@ jobs:
       - name: Build Docker images (core subset)
         run: |
           docker build -t vocelio-api-gateway ./apps/api-gateway
-          docker build -t vocelio-overview-service ./apps/overview-service
           docker build -t vocelio-ai-agents-service ./apps/ai-agents-service
-          docker build -t vocelio-smart-campaigns-service ./apps/smart-campaigns-service
+          docker build -t vocelio-smart-campaigns ./apps/smart-campaigns

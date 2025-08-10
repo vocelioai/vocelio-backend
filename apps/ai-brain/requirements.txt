@@ -1,21 +1,22 @@
 # AI Brain Service Requirements
+-c ../../constraints.txt
 # Production-ready dependencies for Vocelio.ai AI Brain microservice
 
 # Core Framework
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
-pydantic==2.5.0
+fastapi
+uvicorn[standard]
+pydantic
 pydantic-settings==2.1.0
 
 # Database & ORM
-sqlalchemy==2.0.23
-asyncpg==0.29.0
+sqlalchemy
+asyncpg
 alembic==1.13.1
 
 # AI & Machine Learning
 openai==1.3.7
 scikit-learn==1.3.2
-numpy==1.24.4
+numpy
 pandas==2.1.4
 torch==2.1.2
 transformers==4.36.2
@@ -24,21 +25,21 @@ nltk==3.8.1
 spacy==3.7.2
 
 # Redis for caching and real-time features
-redis==5.0.1
+redis
 aioredis==2.0.1
 
 # HTTP Client
-httpx==0.25.2
-aiohttp==3.9.1
+httpx
+aiohttp
 
 # Authentication & Security
-python-jose[cryptography]==3.3.0
-passlib[bcrypt]==1.7.4
-python-multipart==0.0.6
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart
 
 # Monitoring & Logging
-structlog==23.2.0
-prometheus-client==0.19.0
+structlog
+prometheus-client
 sentry-sdk[fastapi]==1.38.0
 
 # Utilities
@@ -48,10 +49,9 @@ ujson==5.8.0
 orjson==3.9.10
 
 # Development & Testing
-pytest==7.4.3
-pytest-asyncio==0.21.1
-pytest-cov==4.1.0
-httpx==0.25.2
+pytest
+pytest-asyncio
+pytest-cov
 faker==20.1.0
 
 # Data Processing
@@ -65,10 +65,10 @@ websockets==12.0
 
 # Background tasks
 celery==5.3.4
-redis==5.0.1
+redis
 
 # Configuration management
-python-dotenv==1.0.0
+python-dotenv
 dynaconf==3.2.4
 
 # API Documentation

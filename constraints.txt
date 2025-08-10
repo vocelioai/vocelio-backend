@@ -1,23 +1,56 @@
-# Central version constraints to help pip's resolver and avoid conflicts
-# Include with: pip install -r requirements.txt -c constraints.txt
+###############################################################################
+# Vocelio Backend Central Constraints File
+# Purpose: Authoritative versions for shared libraries across microservices.
+# Include via '-c constraints.txt' (root) or '-c ../../constraints.txt' (services).
+# Keep minimal. Update consciously.
+###############################################################################
 
-# SIMPLIFIED - removed heavy deps causing conflicts
-# Force numpy compatible with remaining packages
+# Core Web Stack
+fastapi==0.112.2
+starlette==0.37.2
+uvicorn[standard]==0.30.6
+pydantic==2.8.2
+pydantic-core==2.20.1
+
+# HTTP Client (Supabase requires httpx < 0.26)
+httpx==0.25.2
+aiohttp==3.9.1
+
+# Data / Utilities
 numpy==1.25.2
+python-dotenv==1.0.1
+structlog==23.2.0
+prometheus-client==0.19.0
 
-# Pin aiohttp transitive deps
+# Security / Auth
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.6
+cryptography==41.0.8
+
+# Persistence
+sqlalchemy==2.0.23
+asyncpg==0.29.0
+redis==5.0.1
+
+# Testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+
+# Tooling
+black==23.11.0
+isort==5.12.0
+flake8==6.1.0
+mypy==1.7.1
+pre-commit==3.6.0
+
+# Supporting transitive stability
 multidict==6.0.4
 yarl==1.9.4
 frozenlist==1.4.0
 aiosignal==1.3.1
-
-# Ensure click compatibility for Typer
 click==8.1.7
-
-# Prevent openai / anthropic overlap issues
-httpx==0.25.2
-
-# Prevent setuptools regressions
 setuptools==69.0.2
 wheel==0.42.0
 pip==23.3.2

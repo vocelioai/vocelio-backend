@@ -1,6 +1,7 @@
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
-pydantic==2.5.0
+ -c ../../constraints.txt
+fastapi
+uvicorn[standard]
+pydantic
 pydantic-settings==2.1.0
 
 # Payment processing
@@ -8,17 +9,17 @@ stripe==7.8.0
 paypal-checkout-serversdk==1.0.1
 
 # Database
-sqlalchemy[asyncio]==2.0.23
-asyncpg==0.29.0
+sqlalchemy[asyncio]
+asyncpg
 
 # HTTP
-httpx[http2]==0.25.2
+httpx[http2]
 requests==2.31.0
 
 # Authentication & Security  
-python-jose[cryptography]==3.3.0
-passlib[bcrypt]==1.7.4
-cryptography==41.0.8
+python-jose[cryptography]
+passlib[bcrypt]
+cryptography
 
 # Email
 fastapi-mail==1.4.1
@@ -26,8 +27,8 @@ aiosmtplib==3.0.1
 
 # Utilities
 python-dateutil==2.8.2
-python-dotenv==1.0.0
-structlog==23.2.0
+python-dotenv
+structlog
 
 # PDF generation (for invoices)
 reportlab==4.0.7

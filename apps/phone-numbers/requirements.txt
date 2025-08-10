@@ -1,12 +1,13 @@
 # apps/phone-numbers/requirements.txt
+-c ../../constraints.txt
 # FastAPI and ASGI
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
-pydantic==2.5.0
+fastapi
+uvicorn[standard]
+pydantic
 pydantic-settings==2.1.0
 
 # Database
-sqlalchemy==2.0.23
+sqlalchemy
 alembic==1.13.1
 psycopg2-binary==2.9.9
 
@@ -16,29 +17,28 @@ stripe==7.8.0
 phonenumbers==8.13.25
 
 # HTTP and networking
-httpx==0.25.2
+httpx
 aiofiles==23.2.1
-python-multipart==0.0.6
+python-multipart
 
 # Authentication and security
-python-jose[cryptography]==3.3.0
-passlib[bcrypt]==1.7.4
-python-multipart==0.0.6
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart
 
 # Utilities
-python-dotenv==1.0.0
+python-dotenv
 email-validator==2.1.0
-redis==5.0.1
+redis
 
 # Monitoring and logging
-structlog==23.2.0
-prometheus-client==0.19.0
+structlog
+prometheus-client
 
 # Testing (dev dependencies)
-pytest==7.4.3
-pytest-asyncio==0.21.1
-pytest-cov==4.1.0
-httpx==0.25.2  # For testing
+pytest
+pytest-asyncio
+pytest-cov
 
 ---
 

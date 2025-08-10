@@ -2,16 +2,17 @@
 # Proven FastAPI 0.112.2 compatible dependencies
 
 # Core FastAPI Stack (Proven working)
-fastapi==0.112.2
-starlette==0.37.2
-uvicorn[standard]==0.30.6
-httpx==0.27.2
-pydantic==2.8.2
-pydantic-core==2.20.1
-python-dotenv==1.0.1
+-c ../../constraints.txt
+fastapi
+starlette
+uvicorn[standard]
+httpx
+pydantic
+pydantic-core
+python-dotenv
 
 # Utilities (Standardized)
-python-dotenv==1.0.0
+python-dotenv
 
 # Production (Standardized)
 gunicorn==21.2.0

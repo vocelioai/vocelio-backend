@@ -1,34 +1,35 @@
 # Settings Service Dependencies
+-c ../../constraints.txt
 
 # FastAPI and ASGI
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
-python-multipart==0.0.6
+fastapi
+uvicorn[standard]
+python-multipart
 
 # Database and ORM
 supabase==2.0.2
 postgrest==0.13.2
-sqlalchemy==2.0.23
+sqlalchemy
 psycopg2-binary==2.9.9
 alembic==1.13.0
 
 # Authentication and Security
-python-jose[cryptography]==3.3.0
-passlib[bcrypt]==1.7.4
-python-multipart==0.0.6
-cryptography==41.0.8
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart
+cryptography
 
 # Validation and Serialization
-pydantic==2.5.0
+pydantic
 pydantic-settings==2.1.0
 email-validator==2.1.0
 
 # HTTP Client
-httpx==0.25.2
-aiohttp==3.9.1
+httpx
+aiohttp
 
 # Caching and Session Management
-redis==5.0.1
+redis
 aioredis==2.0.1
 
 # Email
@@ -43,8 +44,8 @@ aiofiles==23.2.1
 python-magic==0.4.27
 
 # Monitoring and Logging
-prometheus-client==0.19.0
-structlog==23.2.0
+prometheus-client
+structlog
 
 # Timezone and Date Handling
 pytz==2023.3
@@ -55,19 +56,18 @@ orjson==3.9.10
 ujson==5.8.0
 
 # Testing (for development)
-pytest==7.4.3
-pytest-asyncio==0.21.1
-pytest-cov==4.1.0
-httpx==0.25.2
+pytest
+pytest-asyncio
+pytest-cov
 
 # Development Tools
-black==23.11.0
-flake8==6.1.0
-mypy==1.7.1
+black
+flake8
+mypy
 
 # Environment and Configuration
-python-dotenv==1.0.0
+python-dotenv
 
 # Utilities
-click==8.1.7
+click
 rich==13.7.0

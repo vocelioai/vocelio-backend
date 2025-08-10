@@ -2,20 +2,21 @@
 # Enterprise-grade campaign management and optimization service
 
 # Core dependencies (Standardized)
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
-pydantic==2.5.0
-python-multipart==0.0.6
+ -c ../../constraints.txt
+fastapi
+uvicorn[standard]
+pydantic
+python-multipart
 
 # Database (Standardized)
-asyncpg==0.29.0
-redis[hiredis]==5.0.1
+asyncpg
+redis[hiredis]
 
 # HTTP & Networking (Standardized)
-httpx[http2]==0.25.2
+httpx[http2]
 
 # Utilities (Standardized)
-python-dotenv==1.0.0
+python-dotenv
 
 # Production (Standardized)
 gunicorn==21.2.0
