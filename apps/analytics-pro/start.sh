@@ -5,9 +5,6 @@
 echo "🚀 Starting Vocelio.ai Analytics Pro Service..."
 echo "=================================="
 
-# Activate virtual environment
-source /opt/venv/bin/activate
-
 # Set PYTHONPATH for proper module imports
 export PYTHONPATH=.
 
@@ -38,4 +35,4 @@ health_check
 
 # Start the Analytics Pro Service
 echo "📊 Starting FastAPI Analytics Pro Service on port $PORT..."
-exec uvicorn main_test:app --host 0.0.0.0 --port $PORT
+exec uvicorn main_test:app --host 0.0.0.0 --port "$PORT"

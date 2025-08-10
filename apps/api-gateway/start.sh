@@ -1,18 +1,23 @@
 #!/bin/sh
 # Startup script for api-gateway service
+
+# Set default port
 PORT=${PORT:-8000}
-echo "🚀 Starting Vocelio.ai API Gateway on port $PORT..."
-exec uvicorn src.main:app --host 0.0.0.0 --port "$PORT"
 
 # Create temporary directory for uploads
-mkdir -p tmp/uploads
+mkdir -p tmp/uploads logs
 
 # Set permissions
-chmod 755 logs tmp
+chmod 755 logs tmp 2>/dev/null || true
 
 # Print configuration info
 echo "📊 Configuration:"
 echo "   Environment: ${ENVIRONMENT:-development}"
+echo "   Port: $PORT"
+echo "   Python Path: $PYTHONPATH"
+
+echo "🚀 Starting Vocelio.ai API Gateway on port $PORT..."
+exec uvicorn src.main:app --host 0.0.0.0 --port "$PORT"
 echo "   Log Level: ${LOG_LEVEL:-INFO}"
 echo "   Redis URL: ${REDIS_URL:+configured}"
 echo "   Database URL: ${DATABASE_URL:+configured}"
