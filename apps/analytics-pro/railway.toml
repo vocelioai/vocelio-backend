@@ -1,53 +1,47 @@
-# Analytics Pro Service - Railway Configuration
-# 📊 Advanced Analytics & Business Intelligence Deployment
+# apps/analytics-pro/railway.toml
 
 [build]
-builder = "dockerfile"
+builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
 
 [deploy]
 healthcheckPath = "/health"
 healthcheckTimeout = 30
-restartPolicyType = "on_failure"
+numReplicas = 1
+sleepApplication = false
+restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 3
 
-[environments.production]
+[env]
 # Service Configuration
 SERVICE_NAME = "analytics-pro"
 ENVIRONMENT = "production"
-PORT = "8006"
-WORKERS = "4"
 
-# Performance Settings
+# Database
+DATABASE_URL = "${{PostgreSQL.DATABASE_URL}}"
+REDIS_URL = "${{Redis.REDIS_URL}}"
+
+# Analytics Configuration
 CACHE_TTL_SECONDS = "300"
 REAL_TIME_UPDATE_INTERVAL = "3"
 MAX_QUERY_RANGE_DAYS = "90"
 QUERY_TIMEOUT_SECONDS = "15"
 
-# Security
-RATE_LIMIT_REQUESTS = "500"
-RATE_LIMIT_WINDOW = "3600"
-
-# Database Configuration (will be injected by Railway)
-# DATABASE_URL = "${{ Postgres.DATABASE_URL }}"
+# Performance Settings
 DATABASE_POOL_SIZE = "10"
-DATABASE_MAX_OVERFLOW = "20"
-DATABASE_POOL_TIMEOUT = "30"
-
-# Redis Configuration (will be injected by Railway)
-# REDIS_URL = "${{ Redis.REDIS_URL }}"
 REDIS_POOL_SIZE = "10"
-REDIS_TIMEOUT = "5"
 
-# External Service URLs (Railway internal networking)
-API_GATEWAY_URL = "http://api-gateway.railway.internal:8000"
-CALL_CENTER_SERVICE_URL = "http://call-center.railway.internal:8001"
-AGENTS_SERVICE_URL = "http://agents.railway.internal:8002"
-CAMPAIGNS_SERVICE_URL = "http://smart-campaigns.railway.internal:8003"
-VOICE_LAB_SERVICE_URL = "http://voice-lab.railway.internal:8005"
-AI_BRAIN_SERVICE_URL = "http://ai-brain.railway.internal:8009"
+# API Configuration
+PORT = "8010"
+PYTHONPATH = "."
 
-# CORS Configuration
+# Performance
+UVICORN_WORKERS = "1"
+UVICORN_TIMEOUT = "60"
+
+# Monitoring
+LOG_LEVEL = "INFO"
+ENABLE_METRICS = "true"
 ALLOWED_ORIGINS = "https://app.vocelio.ai,https://vocelio.ai,https://*.vocelio.ai"
 ALLOWED_HOSTS = "*.vocelio.ai,*.railway.app"
 
