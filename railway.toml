@@ -2,8 +2,9 @@
 builder = "NIXPACKS"
 
 [deploy]
-# Use --app-dir so we can import src.main from inside apps/api-gateway (folder name has a hyphen so cannot be part of dotted path)
-startCommand = "uvicorn --app-dir apps/api-gateway src.main:app --host 0.0.0.0 --port $PORT --workers 2"
+# Use a shell so $PORT is expanded (previously passed literally to uvicorn)
+# ${PORT:-8000} provides a sane fallback for local runs / non-platform starts.
+startCommand = "sh -c 'python -m uvicorn --app-dir apps/api-gateway src.main:app --host 0.0.0.0 --port ${PORT:-8000} --workers ${UVICORN_WORKERS:-2}'"
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 3
 

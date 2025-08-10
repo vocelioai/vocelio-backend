@@ -2,7 +2,7 @@
 builder = "NIXPACKS"
 
 [deploy]
-startCommand = "uvicorn src.main:app --host 0.0.0.0 --port $PORT --workers 2"
+startCommand = "sh -c 'python -m uvicorn src.main:app --host 0.0.0.0 --port ${PORT:-8013} --workers ${UVICORN_WORKERS:-2}'"
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 3
 

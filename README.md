@@ -179,7 +179,7 @@ provider = "nixpacks"
 PYTHON_VERSION = "3.11"
 
 [start]
-cmd = "uvicorn src.main:app --host 0.0.0.0 --port $PORT --workers 2"
+cmd = "sh -c 'python -m uvicorn src.main:app --host 0.0.0.0 --port ${PORT:-8000} --workers ${UVICORN_WORKERS:-2}'"
 ```
 
 ### API Gateway Routing
