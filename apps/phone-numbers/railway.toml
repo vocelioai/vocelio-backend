@@ -1,0 +1,39 @@
+# apps/phone-numbers/railway.toml
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+healthcheckPath = "/health"
+healthcheckTimeout = 30
+numReplicas = 1
+sleepApplication = false
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
+
+[env]
+# Service Configuration
+SERVICE_NAME = "phone-numbers"
+ENVIRONMENT = "production"
+
+# External APIs (for future integration)
+TWILIO_ACCOUNT_SID = "${{Twilio.ACCOUNT_SID}}"
+TWILIO_AUTH_TOKEN = "${{Twilio.AUTH_TOKEN}}"
+STRIPE_SECRET_KEY = "${{Stripe.SECRET_KEY}}"
+STRIPE_PUBLISHABLE_KEY = "${{Stripe.PUBLISHABLE_KEY}}"
+
+# Database
+DATABASE_URL = "${{PostgreSQL.DATABASE_URL}}"
+
+# API Configuration
+PORT = "8008"
+PYTHONPATH = "."
+
+# Performance
+UVICORN_WORKERS = "1"
+UVICORN_TIMEOUT = "60"
+
+# Monitoring
+LOG_LEVEL = "INFO"
+ENABLE_METRICS = "true"
