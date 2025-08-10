@@ -8,6 +8,7 @@ pydantic-core
 python-dotenv
 asyncpg
 python-jose[cryptography]
+PyJWT
 python-multipart
 structlog
 

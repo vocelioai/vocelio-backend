@@ -75,6 +75,9 @@ google-cloud-storage==2.10.0
 
 # Configuration & Environment
 python-dotenv
+PyJWT
+
+# Development & Testing (Standardized)
 click
 
 # Date & Time Utilities

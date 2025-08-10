@@ -13,6 +13,7 @@ asyncpg
 supabase>=2.0.0
 
 # Authentication & Security
+PyJWT
 python-jose[cryptography]
 passlib[bcrypt]
 python-multipart

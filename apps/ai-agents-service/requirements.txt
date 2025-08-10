@@ -11,6 +11,9 @@ pydantic
 pydantic-core
 python-dotenv
 
+# Authentication
+PyJWT
+
 # Utilities (Standardized)
 python-dotenv
 

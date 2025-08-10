@@ -17,6 +17,7 @@ httpx[http2]
 
 # Utilities (Standardized)
 python-dotenv
+PyJWT
 
 # Production (Standardized)
 gunicorn==21.2.0
