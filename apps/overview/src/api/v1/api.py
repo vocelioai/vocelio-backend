@@ -7,6 +7,7 @@ from fastapi import APIRouter
 from api.v1.endpoints.dashboard import router as dashboard_router
 from api.v1.endpoints.metrics import router as metrics_router
 from api.v1.endpoints.reports import router as reports_router
+from api.v1.endpoints.dashboard_integration import router as integration_router
 
 # Create main API router
 api_router = APIRouter()
@@ -28,6 +29,13 @@ api_router.include_router(
     reports_router, 
     prefix="/reports", 
     tags=["Reports"]
+)
+
+# Dashboard Integration - Main endpoints for frontend
+api_router.include_router(
+    integration_router,
+    prefix="/integration",
+    tags=["Dashboard Integration"]
 )
 
 @api_router.get("/")
