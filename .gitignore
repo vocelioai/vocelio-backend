@@ -19,6 +19,23 @@ build/
 dist/
 *.egg-info/
 
+# Frontend Files (Keep frontend in separate repo)
+vocelio-dashboard/
+*.js
+*.jsx
+*.ts
+*.tsx
+node_modules/
+package*.json
+yarn.lock
+.next/
+build/
+dist/
+
+# Temporary Integration Files
+VERCEL_ENV_VARIABLES.env
+INTEGRATION_GUIDE.md
+
 # VSCode
 .vscode/
 
