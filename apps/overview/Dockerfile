@@ -1,5 +1,22 @@
 # Overview Service Dockerfile
-# V# Copy application code
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential libpq-dev \
+ && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements and constraints
+COPY requirements.txt /app/requirements.txt
+COPY ../../constraints.txt /app/constraints.txt
+
+# Install Python dependencies
+RUN python -m pip install --upgrade pip wheel setuptools \
+ && pip install --no-cache-dir -r /app/requirements.txt -c /app/constraints.txt
+
+# Copy application code
 COPY . .
 
 # Make start script executable
