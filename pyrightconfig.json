@@ -1,0 +1,18 @@
+{
+    "include": [
+        "shared",
+        "apps"
+    ],
+    "extraPaths": [
+        "./shared",
+        "./apps"
+    ],
+    "pythonVersion": "3.11",
+    "typeCheckingMode": "basic",
+    "useLibraryCodeForTypes": true,
+    "reportMissingImports": "warning",
+    "reportMissingTypeStubs": false,
+    "reportImportCycles": "warning",
+    "reportUnusedImport": "information",
+    "reportUnusedVariable": "information"
+}
