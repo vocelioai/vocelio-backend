@@ -1,0 +1,38 @@
+# apps/ai-agents-service/railway.toml
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+healthcheckPath = "/health"
+healthcheckTimeout = 30
+numReplicas = 1
+sleepApplication = false
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
+
+[env]
+# Service Configuration
+SERVICE_NAME = "ai-agents-service"
+ENVIRONMENT = "production"
+
+# Database
+DATABASE_URL = "${{PostgreSQL.DATABASE_URL}}"
+REDIS_URL = "${{Redis.REDIS_URL}}"
+
+# API Configuration
+PORT = "8002"
+PYTHONPATH = "."
+
+# AI Configuration
+AI_MODEL_PRIMARY = "claude-3-5-sonnet"
+AI_MODEL_FALLBACK = "gpt-4-turbo"
+
+# Performance
+UVICORN_WORKERS = "1"
+UVICORN_TIMEOUT = "60"
+
+# Monitoring
+LOG_LEVEL = "INFO"
+ENABLE_METRICS = "true"

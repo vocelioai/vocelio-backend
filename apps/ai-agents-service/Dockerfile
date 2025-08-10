@@ -1,56 +1,46 @@
-# Vocelio.ai AI Agents Service Dockerfile
+# 🤖 Vocelio.ai AI Agents Service Dockerfile
+# Based on proven FastAPI 0.112.2 compatible configuration
+
 FROM python:3.11-slim
+
+# System dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    gcc \
+    libsndfile1 \
+    ffmpeg \
+    libpq-dev \
+    libffi-dev \
+    libssl-dev \
+    curl \
+  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    PORT=8002
-
-# System deps
-RUN apt-get update && apt-get install -y gcc && rm -rf /var/lib/apt/lists/*
-
-# Install requirements first (cache layer)
+# Copy requirements and install dependencies
 COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+RUN python -m venv /opt/venv \
+  && . /opt/venv/bin/activate \
+  && pip install --upgrade pip wheel setuptools \
+  && pip install --no-cache-dir -r requirements.txt
 
-# Copy app
+# Copy application code
 COPY . .
 
-# Wait script to ensure Postgres & Redis are ready
-RUN set -eux; \
-    cat > /app/wait_for_services.py <<'EOF'
-import os, time, sys, asyncio, socket
-POSTGRES = (os.getenv('POSTGRES_HOST','postgres'), int(os.getenv('POSTGRES_PORT','5432')))
-REDIS = (os.getenv('REDIS_HOST','redis'), int(os.getenv('REDIS_PORT','6379')))
-TIMEOUT=float(os.getenv('STARTUP_WAIT_TIMEOUT','40'))
-async def check_postgres():
-    try:
-        import asyncpg
-        conn = await asyncpg.connect(host=POSTGRES[0], port=POSTGRES[1], user=os.getenv('POSTGRES_USER','postgres'), password=os.getenv('POSTGRES_PASSWORD','password'), database=os.getenv('POSTGRES_DB','vocelio'), timeout=3)
-        await conn.close(); return True
-    except Exception: return False
-def check_socket(target):
-    try:
-        import socket as s
-        with s.create_connection(target, timeout=1.5): return True
-    except Exception: return False
-async def main():
-    start=time.time(); print('[wait] (ai-agents) waiting for services...')
-    while True:
-        if await check_postgres() and check_socket(REDIS):
-            print(f'[wait] dependencies ready in {time.time()-start:.1f}s'); return
-        if time.time()-start>TIMEOUT: print('[wait] timeout', file=sys.stderr); sys.exit(1)
-        time.sleep(1.2)
-if __name__=='__main__': asyncio.run(main())
-EOF
+# Make start script executable
+RUN chmod +x start.sh
 
-# Non-root user
+# Create non-root user
 RUN adduser --disabled-password --gecos '' appuser && chown -R appuser:appuser /app
 USER appuser
 
-EXPOSE 8002
+# Activate virtual environment and set environment
+ENV PATH="/opt/venv/bin:$PATH"
+ENV PYTHONPATH="."
 
-HEALTHCHECK --interval=30s --timeout=5s --retries=3 CMD python -c "import httpx; httpx.get('http://localhost:8002/health')"
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:${PORT:-8002}/health || exit 1
 
-CMD ["bash", "-c", "python wait_for_services.py && python main.py"]
+# Use start.sh script
+CMD ["./start.sh"]
