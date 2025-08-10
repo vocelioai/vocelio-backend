@@ -2,7 +2,7 @@
 builder = "NIXPACKS"
 
 [deploy]
-startCommand = "cd apps/api-gateway && python railway_start.py"
+startCommand = "python simple_gateway.py"
 healthcheckPath = "/health"
 healthcheckTimeout = 60
 restartPolicyType = "ON_FAILURE"
@@ -12,4 +12,3 @@ restartPolicyMaxRetries = 3
 PYTHONUNBUFFERED = "1"
 PYTHONDONTWRITEBYTECODE = "1"
 LOG_LEVEL = "INFO"
-PYTHONPATH = ".:apps/api-gateway:shared"
