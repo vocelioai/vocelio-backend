@@ -1,0 +1,46 @@
+# Railway Environment Variables Setup Commands
+# Copy and paste these commands to set up your Railway environment variables
+
+# Step 1: Install Railway CLI (if not installed)
+# npm install -g @railway/cli
+# railway login
+
+# Step 2: Set Safe Variables (copy these commands)
+railway variables set ENVIRONMENT="production"
+railway variables set PORT="8000"
+railway variables set DEBUG="false"
+railway variables set JWT_ALGORITHM="HS256"
+railway variables set JWT_EXPIRE_MINUTES="1440"
+railway variables set OPENAI_MODEL="gpt-4o-mini"
+railway variables set CORS_ORIGINS="https://*.railway.app,https://*.vocelio.ai"
+railway variables set ALLOWED_ORIGINS="https://*.railway.app,https://*.vocelio.ai"
+railway variables set ALLOWED_HOSTS="*"
+railway variables set TEAM_HUB_SERVICE_URL="https://team-hub-production.up.railway.app"
+railway variables set OVERVIEW_SERVICE_URL="https://overview-production.up.railway.app"
+railway variables set AI_AGENTS_SERVICE_URL="https://ai-agents-service-production.up.railway.app"
+railway variables set SMART_CAMPAIGNS_SERVICE_URL="https://smart-campaigns-production.up.railway.app"
+railway variables set PHONE_NUMBERS_SERVICE_URL="https://phone-numbers-production.up.railway.app"
+railway variables set ANALYTICS_SERVICE_URL="https://analytics-pro-production.up.railway.app"
+railway variables set RATE_LIMIT_REQUESTS="1000"
+railway variables set RATE_LIMIT_WINDOW="3600"
+railway variables set PROMETHEUS_ENABLED="true"
+railway variables set PROMETHEUS_PORT="9090"
+railway variables set DEFAULT_FROM_EMAIL="support@vocelio.ai"
+
+# Step 3: Set Secret Variables (replace with your actual values)
+# railway variables set JWT_SECRET_KEY="your_jwt_secret_here"
+# railway variables set SECRET_KEY="your_secret_key_here"
+# railway variables set DATABASE_URL="your_database_url_here"
+# railway variables set SUPABASE_URL="your_supabase_url_here"
+# railway variables set SUPABASE_KEY="your_supabase_key_here"
+# railway variables set OPENAI_API_KEY="your_openai_key_here"
+# railway variables set ANTHROPIC_API_KEY="your_anthropic_key_here"
+# railway variables set ELEVENLABS_API_KEY="your_elevenlabs_key_here"
+# railway variables set TWILIO_ACCOUNT_SID="your_twilio_sid_here"
+# railway variables set TWILIO_AUTH_TOKEN="your_twilio_token_here"
+# railway variables set STRIPE_SECRET_KEY="your_stripe_secret_here"
+# railway variables set STRIPE_WEBHOOK_SECRET="your_stripe_webhook_secret_here"
+# railway variables set STRIPE_PUBLISHABLE_KEY="your_stripe_publishable_key_here"
+
+# Step 4: Verify all variables are set
+# railway variables

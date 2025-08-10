@@ -1,29 +1,6 @@
- -c ../../constraints.txt
-fastapi
-uvicorn[standard]
-pydantic
-pydantic-settings==2.1.0
-
-# HTTP & API
-httpx[http2]
-requests==2.31.0
-
-# Security
-python-jose[cryptography]
-cryptography
-
-# Database
-sqlalchemy[asyncio]
-asyncpg
-
-# Utilities
-python-dateutil==2.8.2
-python-dotenv
-structlog
-
-# Report generation
-reportlab==4.0.7
-openpyxl==3.1.2
-
-# Compliance APIs
-zeep==4.2.1
+fastapi==0.112.2
+uvicorn[standard]==0.30.6
+python-multipart==0.0.9
+pydantic==2.8.2
+httpx==0.25.2
+python-dotenv==1.0.1
