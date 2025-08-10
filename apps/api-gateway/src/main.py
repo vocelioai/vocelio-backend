@@ -88,7 +88,7 @@ async def add_process_time_header(request: Request, call_next):
     return response
 
 # Include routers
-app.include_router(health_router, prefix="/health", tags=["Health"])
+app.include_router(health_router, tags=["Health"])  # No prefix - routes defined in health.py will be direct
 app.include_router(proxy_router, tags=["Proxy"])
 
 @app.get("/")

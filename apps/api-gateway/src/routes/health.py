@@ -23,7 +23,7 @@ SERVICES = {
 
 service_discovery = ServiceDiscovery(SERVICES)
 
-@router.get("/")
+@router.get("/health")
 async def gateway_health():
     """Basic gateway health check"""
     return {
@@ -35,7 +35,7 @@ async def gateway_health():
         "uptime": "operational"
     }
 
-@router.get("/detailed")
+@router.get("/health/detailed")
 async def detailed_health_check():
     """Comprehensive health check of gateway and all services"""
     start_time = datetime.utcnow()
