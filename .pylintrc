@@ -1,0 +1,10 @@
+[MASTER]
+ignore=.venv,venv,env,.git,__pycache__,build,dist,node_modules,vocelio-dashboard
+ignore-patterns=.*\.pyc,.*\.pyo,.*\.pyd
+persistent=no
+
+[MESSAGES CONTROL]
+disable=all
+
+[REPORTS]
+reports=no

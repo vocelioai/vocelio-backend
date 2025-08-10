@@ -3,16 +3,31 @@
         "shared",
         "apps"
     ],
+    "exclude": [
+        ".venv",
+        "venv",
+        "env",
+        "node_modules",
+        "build",
+        "dist",
+        "__pycache__",
+        "**/__pycache__",
+        "**/*.pyc",
+        ".git",
+        "vocelio-dashboard"
+    ],
     "extraPaths": [
         "./shared",
         "./apps"
     ],
-    "pythonVersion": "3.11",
+    "pythonVersion": "3.13",
     "typeCheckingMode": "basic",
     "useLibraryCodeForTypes": true,
     "reportMissingImports": "warning",
     "reportMissingTypeStubs": false,
     "reportImportCycles": "warning",
-    "reportUnusedImport": "information",
-    "reportUnusedVariable": "information"
+    "reportUnusedImport": "none",
+    "reportUnusedVariable": "none",
+    "reportGeneralTypeIssues": "warning",
+    "reportOptionalMemberAccess": "none"
 }

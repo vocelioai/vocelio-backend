@@ -333,3 +333,9 @@ def get_db() -> Generator[Session, None, None]:
         yield db
     finally:
         db.close()
+
+
+def add_error_handling(app):
+    """Add error handling middleware to FastAPI app"""
+    app.middleware("http")(error_handling_middleware)
+    print("✅ Error handling middleware added")

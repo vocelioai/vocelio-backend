@@ -1,0 +1,65 @@
+# 🚫 VS Code Analysis Exclusions
+# These paths should be excluded from Python analysis
+
+# Virtual Environment
+.venv/
+.env/
+venv/
+env/
+
+# Build directories
+build/
+dist/
+*.egg-info/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Node.js (if any React files got mixed in)
+node_modules/
+package-lock.json
+yarn.lock
+
+# Frontend files (shouldn't be here anyway)
+vocelio-dashboard/
+*.js
+*.jsx
+*.ts
+*.tsx
+*.css
+*.scss
+*.html
+
+# Railway/Docker temp files
+.railway/
+.docker/
+
+# Git
+.git/
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+logs/
+
+# Database
+*.db
+*.sqlite
+
+# Cache
+.pytest_cache/
+.mypy_cache/
+.coverage
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Documentation build
+docs/_build/

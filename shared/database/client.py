@@ -466,5 +466,23 @@ __all__ = [
     "agent_repo", 
     "campaign_repo",
     "call_repo",
-    "check_database_health"
+    "check_database_health",
+    "init_database",
+    "get_database"
 ]
+
+# Global database instance
+_db_client = None
+
+def init_database():
+    """Initialize the global database client"""
+    global _db_client
+    _db_client = SupabaseClient()
+    return _db_client
+
+def get_database():
+    """Get the global database client"""
+    global _db_client
+    if _db_client is None:
+        _db_client = init_database()
+    return _db_client

@@ -40,7 +40,7 @@ class DependencyAnalyzer:
         
         # Skip comments and empty lines
         if not line or line.startswith('#'):
-            return None, None
+            return "", ""
         
         # Handle different version specifications
         patterns = [
@@ -70,7 +70,7 @@ class DependencyAnalyzer:
                 else:
                     return match.group(1).lower(), "latest"
         
-        return None, None
+        return "", ""
     
     def load_requirements(self, file_path: Path) -> List[str]:
         """Load requirements from a file"""
@@ -339,7 +339,7 @@ class DependencyAnalyzer:
         self.generate_recommendations()
         
         # Save consolidated requirements
-        self.save_consolidated_requirements(self.root_path)
+        self.save_consolidated_requirements(str(self.root_path))
         
         print("\n" + "=" * 60)
         print("✅ Dependency analysis complete!")
