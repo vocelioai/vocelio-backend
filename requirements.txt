@@ -91,8 +91,8 @@ psutil==5.9.6
 # Additional Redis Support
 ## (redis & httpx extras consolidated above)
 
-# JSON Web Tokens
-PyJWT==2.8.0
+# JSON Web Tokens (now in constraints.txt)
+PyJWT
 
 # Supabase Client
 supabase==2.0.2
