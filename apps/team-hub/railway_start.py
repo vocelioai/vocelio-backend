@@ -2,6 +2,7 @@
 """
 Railway startup script for Vocelio.ai services
 Handles PORT environment variable properly for Railway deployment
+Updated: Fix PyJWT import conflict by removing python-jose
 """
 import os
 import sys
