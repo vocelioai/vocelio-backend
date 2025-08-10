@@ -4,8 +4,8 @@
 builder = "NIXPACKS"
 
 [deploy]
-# Direct uvicorn command with proper PORT expansion
-startCommand = "sh -c 'uvicorn main_test:app --host 0.0.0.0 --port ${PORT:-8008} --workers 1'"
+# Use Python script to handle PORT variable properly
+startCommand = "python railway_start.py"
 healthcheckPath = "/health"
 healthcheckTimeout = 30
 numReplicas = 1
