@@ -48,9 +48,16 @@ async def root():
         "timestamp": datetime.utcnow().isoformat(),
         "services": {
             "api-gateway": "online",
-            "overview-service": "pending",
+            "overview-service": "embedded",
             "ai-agents-service": "pending",
             "smart-campaigns-service": "pending"
+        },
+        "endpoints": {
+            "health": "/health",
+            "dashboard": "/api/v1/dashboard", 
+            "system_status": "/api/v1/system/status",
+            "metrics": "/api/v1/metrics",
+            "docs": "/docs"
         }
     }
 
@@ -95,8 +102,98 @@ async def api_status():
         "features": [
             "cors_enabled",
             "health_checks",
-            "basic_routing"
+            "basic_routing",
+            "overview_service"
         ]
+    }
+
+# Overview Service Routes (embedded for simplicity)
+@app.get("/api/v1/dashboard")
+async def dashboard():
+    """Main dashboard data"""
+    return {
+        "dashboard": {
+            "title": "Vocelio AI Call Center",
+            "status": "operational",
+            "services": {
+                "total": 4,
+                "online": 1,
+                "pending": 3,
+                "offline": 0
+            },
+            "stats": {
+                "total_calls": 0,
+                "active_campaigns": 0,
+                "ai_agents": 0,
+                "success_rate": "0%"
+            },
+            "recent_activity": [
+                {
+                    "timestamp": datetime.utcnow().isoformat(),
+                    "event": "API Gateway deployed successfully",
+                    "type": "deployment"
+                }
+            ],
+            "alerts": []
+        },
+        "timestamp": datetime.utcnow().isoformat()
+    }
+
+@app.get("/api/v1/system/status")
+async def system_status():
+    """System status overview"""
+    return {
+        "system": {
+            "name": "Vocelio AI Call Center",
+            "version": "2.0.0",
+            "environment": os.environ.get("RAILWAY_ENVIRONMENT", "production"),
+            "uptime": "operational",
+            "health": "healthy"
+        },
+        "services": {
+            "api-gateway": {
+                "status": "online",
+                "version": "2.0.0",
+                "health": "healthy",
+                "url": "/"
+            },
+            "overview-service": {
+                "status": "embedded",
+                "version": "1.0.0",
+                "health": "healthy",
+                "url": "/api/v1/dashboard"
+            },
+            "ai-agents-service": {
+                "status": "pending",
+                "version": "unknown",
+                "health": "not deployed"
+            },
+            "smart-campaigns-service": {
+                "status": "pending",
+                "version": "unknown", 
+                "health": "not deployed"
+            }
+        },
+        "timestamp": datetime.utcnow().isoformat()
+    }
+
+@app.get("/api/v1/metrics")
+async def basic_metrics():
+    """Basic system metrics"""
+    return {
+        "metrics": {
+            "requests_total": 0,
+            "requests_per_minute": 0,
+            "response_time_avg": 0,
+            "error_rate": 0,
+            "active_connections": 1
+        },
+        "performance": {
+            "cpu_usage": "optimal",
+            "memory_usage": "low",
+            "disk_usage": "minimal"
+        },
+        "timestamp": datetime.utcnow().isoformat()
     }
 
 # Simple middleware for request logging
