@@ -1,0 +1,101 @@
+# apps/lead-management/railway.toml
+
+[build]
+builder = "NIXPACKS"
+
+[deploy]
+# Use Python script to handle PORT variable properly
+startCommand = "python railway_start.py"
+healthcheckPath = "/health"
+healthcheckTimeout = 30
+numReplicas = 1
+sleepApplication = false
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
+
+[env]
+PYTHONUNBUFFERED = "1"
+PYTHONDONTWRITEBYTECODE = "1"
+PYTHONPATH = "."
+LOG_LEVEL = "INFO"
+SERVICE_NAME = "lead-management"
+SERVICE_VERSION = "1.0.0"
+
+# OpenAI API Configuration
+OPENAI_API_KEY = "${{ OPENAI_API_KEY }}"
+OPENAI_MODEL = "gpt-4"
+
+# Database Configuration
+DATABASE_URL = "${{ DATABASE_URL }}"
+REDIS_URL = "${{ REDIS_URL }}"
+
+# CRM Integration
+CRM_API_KEY = "${{ CRM_API_KEY }}"
+CRM_ENDPOINT = "${{ CRM_ENDPOINT }}"
+ENABLE_CRM_SYNC = "true"
+SYNC_INTERVAL = "300"
+
+# Lead Scoring
+AI_LEAD_SCORING = "true"
+LEAD_SCORE_THRESHOLD = "70"
+AUTO_QUALIFICATION = "true"
+QUALIFICATION_CRITERIA = "budget,authority,need,timeline"
+
+# Communication Settings
+EMAIL_SERVICE_URL = "${{ EMAIL_SERVICE_URL }}"
+SMS_SERVICE_URL = "${{ SMS_SERVICE_URL }}"
+ENABLE_AUTO_FOLLOWUP = "true"
+FOLLOWUP_INTERVALS = "1,3,7,14,30"
+
+# Lead Sources
+ENABLE_WEB_TRACKING = "true"
+ENABLE_FORM_CAPTURE = "true"
+ENABLE_CHAT_INTEGRATION = "true"
+ENABLE_SOCIAL_MEDIA_TRACKING = "true"
+
+# Analytics and Reporting
+ENABLE_CONVERSION_TRACKING = "true"
+ENABLE_ATTRIBUTION_MODELING = "true"
+ENABLE_ROI_TRACKING = "true"
+REPORTING_TIMEZONE = "UTC"
+
+# Security and Compliance
+API_KEY = "${{ API_KEY }}"
+WEBHOOK_SECRET = "${{ WEBHOOK_SECRET }}"
+ENABLE_GDPR_COMPLIANCE = "true"
+DATA_RETENTION_DAYS = "2555"
+ENCRYPTION_KEY = "${{ ENCRYPTION_KEY }}"
+
+# AI Features
+ENABLE_LEAD_ENRICHMENT = "true"
+ENABLE_INTENT_DETECTION = "true"
+ENABLE_BEHAVIOR_ANALYSIS = "true"
+ENABLE_PREDICTIVE_ANALYTICS = "true"
+
+# Pipeline Management
+DEFAULT_PIPELINE_STAGES = "new,contacted,qualified,proposal,negotiation,closed-won,closed-lost"
+AUTO_STAGE_PROGRESSION = "true"
+ENABLE_STAGE_AUTOMATION = "true"
+
+# Notifications
+ENABLE_REAL_TIME_ALERTS = "true"
+ALERT_CHANNELS = "email,sms,webhook,slack"
+PRIORITY_LEAD_THRESHOLD = "90"
+
+# Integration Settings
+ENABLE_CALENDAR_SYNC = "true"
+ENABLE_EMAIL_SYNC = "true"
+ENABLE_PHONE_INTEGRATION = "true"
+WEBHOOK_ENDPOINTS = "${{ WEBHOOK_ENDPOINTS }}"
+
+# Performance Settings
+RATE_LIMIT_PER_MINUTE = "200"
+ENABLE_CACHING = "true"
+CACHE_TTL = "900"
+MAX_CONCURRENT_TASKS = "50"
+
+# Lead Deduplication
+ENABLE_DEDUPLICATION = "true"
+DEDUP_FIELDS = "email,phone,company"
+DEDUP_THRESHOLD = "0.9"
+AUTO_MERGE_DUPLICATES = "true"

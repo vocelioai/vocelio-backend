@@ -1,0 +1,161 @@
+# apps/scripts/railway.toml
+
+[build]
+builder = "NIXPACKS"
+
+[deploy]
+# Use Python script to handle PORT variable properly
+startCommand = "python railway_start.py"
+healthcheckPath = "/health"
+healthcheckTimeout = 30
+numReplicas = 1
+sleepApplication = false
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
+
+[env]
+PYTHONUNBUFFERED = "1"
+PYTHONDONTWRITEBYTECODE = "1"
+PYTHONPATH = "."
+LOG_LEVEL = "INFO"
+SERVICE_NAME = "scripts"
+SERVICE_VERSION = "1.0.0"
+
+# OpenAI API Configuration
+OPENAI_API_KEY = "${{ OPENAI_API_KEY }}"
+OPENAI_MODEL = "gpt-4"
+ENABLE_GPT_4_TURBO = "true"
+ENABLE_GPT_3_5_FALLBACK = "true"
+
+# Database Configuration
+DATABASE_URL = "${{ DATABASE_URL }}"
+REDIS_URL = "${{ REDIS_URL }}"
+
+# Script Generation Features
+ENABLE_AI_SCRIPT_GENERATION = "true"
+ENABLE_VOICE_OPTIMIZATION = "true"
+ENABLE_TONE_ADAPTATION = "true"
+ENABLE_PERSONALITY_MATCHING = "true"
+ENABLE_CONTEXT_AWARENESS = "true"
+
+# Conversation Analysis
+ENABLE_SENTIMENT_ANALYSIS = "true"
+ENABLE_INTENT_DETECTION = "true"
+ENABLE_EMOTION_RECOGNITION = "true"
+ENABLE_MOOD_TRACKING = "true"
+ENABLE_ENGAGEMENT_SCORING = "true"
+
+# Dynamic Script Features
+ENABLE_REAL_TIME_ADAPTATION = "true"
+ENABLE_BRANCHING_LOGIC = "true"
+ENABLE_CONDITIONAL_RESPONSES = "true"
+ENABLE_DYNAMIC_VARIABLES = "true"
+ENABLE_CONTEXT_INJECTION = "true"
+
+# Voice Characteristics
+SUPPORTED_VOICE_TYPES = "professional,friendly,casual,formal,empathetic,energetic,calm"
+ENABLE_ACCENT_ADAPTATION = "true"
+ENABLE_PACE_CONTROL = "true"
+ENABLE_EMPHASIS_MARKERS = "true"
+ENABLE_PAUSE_INSERTION = "true"
+
+# Industry Specialization
+ENABLE_INDUSTRY_TEMPLATES = "true"
+SUPPORTED_INDUSTRIES = "healthcare,finance,retail,education,technology,real-estate,insurance,legal"
+ENABLE_COMPLIANCE_CHECKING = "true"
+ENABLE_REGULATORY_VALIDATION = "true"
+
+# Language Support
+DEFAULT_LANGUAGE = "en"
+SUPPORTED_LANGUAGES = "en,es,fr,de,it,pt,ja,ko,zh,ar,hi,ru"
+ENABLE_TRANSLATION = "true"
+ENABLE_CULTURAL_ADAPTATION = "true"
+ENABLE_REGIONAL_DIALECTS = "true"
+
+# Script Optimization
+ENABLE_A_B_TESTING = "true"
+ENABLE_PERFORMANCE_TRACKING = "true"
+ENABLE_CONVERSION_OPTIMIZATION = "true"
+ENABLE_SUCCESS_METRICS = "true"
+OPTIMIZATION_LEARNING_RATE = "0.1"
+
+# Content Management
+MAX_SCRIPT_LENGTH = "5000"
+MIN_SCRIPT_LENGTH = "50"
+ENABLE_SCRIPT_VERSIONING = "true"
+ENABLE_SCRIPT_TEMPLATES = "true"
+ENABLE_CUSTOM_VARIABLES = "true"
+
+# Integration Settings
+CRM_INTEGRATION_URL = "${{ CRM_INTEGRATION_URL }}"
+ANALYTICS_WEBHOOK_URL = "${{ ANALYTICS_WEBHOOK_URL }}"
+ENABLE_CRM_DATA_INJECTION = "true"
+ENABLE_REAL_TIME_UPDATES = "true"
+
+# Quality Assurance
+ENABLE_GRAMMAR_CHECK = "true"
+ENABLE_READABILITY_ANALYSIS = "true"
+ENABLE_CLARITY_SCORING = "true"
+ENABLE_COHERENCE_VALIDATION = "true"
+MIN_QUALITY_SCORE = "7.5"
+
+# Security and Compliance
+API_KEY = "${{ API_KEY }}"
+ENCRYPTION_KEY = "${{ ENCRYPTION_KEY }}"
+WEBHOOK_SECRET = "${{ WEBHOOK_SECRET }}"
+ENABLE_CONTENT_FILTERING = "true"
+ENABLE_PII_DETECTION = "true"
+ENABLE_COMPLIANCE_LOGGING = "true"
+
+# Performance Settings
+RATE_LIMIT_PER_MINUTE = "500"
+GENERATION_TIMEOUT = "30"
+MAX_CONCURRENT_GENERATIONS = "50"
+ENABLE_RESULT_CACHING = "true"
+CACHE_TTL = "1800"
+
+# Advanced AI Features
+ENABLE_NEURAL_VOICE_SYNTHESIS = "true"
+ENABLE_EMOTION_INJECTION = "true"
+ENABLE_PERSONALITY_CONSISTENCY = "true"
+ENABLE_CONVERSATION_MEMORY = "true"
+MEMORY_RETENTION_HOURS = "24"
+
+# Training and Learning
+ENABLE_CONTINUOUS_LEARNING = "true"
+ENABLE_FEEDBACK_INTEGRATION = "true"
+ENABLE_SUCCESS_PATTERN_LEARNING = "true"
+LEARNING_DATA_RETENTION_DAYS = "90"
+MIN_TRAINING_SAMPLES = "100"
+
+# Script Categories
+SCRIPT_CATEGORIES = "cold-call,warm-call,follow-up,closing,objection-handling,appointment-setting,product-demo,customer-service"
+ENABLE_CATEGORY_OPTIMIZATION = "true"
+ENABLE_CROSS_CATEGORY_LEARNING = "true"
+
+# Monitoring and Analytics
+ENABLE_USAGE_ANALYTICS = "true"
+ENABLE_PERFORMANCE_METRICS = "true"
+ENABLE_SUCCESS_TRACKING = "true"
+ANALYTICS_RETENTION_DAYS = "365"
+ENABLE_REAL_TIME_MONITORING = "true"
+
+# Webhook Configuration
+WEBHOOK_ENDPOINTS = "${{ WEBHOOK_ENDPOINTS }}"
+ENABLE_GENERATION_WEBHOOKS = "true"
+ENABLE_SUCCESS_WEBHOOKS = "true"
+ENABLE_FAILURE_WEBHOOKS = "true"
+WEBHOOK_TIMEOUT = "30"
+WEBHOOK_RETRY_ATTEMPTS = "3"
+
+# Export and Integration
+ENABLE_SCRIPT_EXPORT = "true"
+SUPPORTED_EXPORT_FORMATS = "json,xml,csv,txt,docx,pdf"
+ENABLE_API_ACCESS = "true"
+ENABLE_BULK_OPERATIONS = "true"
+
+# Monitoring
+ENABLE_METRICS = "true"
+METRICS_PORT = "9090"
+ENABLE_HEALTH_CHECKS = "true"
+HEALTH_CHECK_INTERVAL = "30"
