@@ -31,7 +31,19 @@ DEPLOYED_SERVICES = {
     "settings": "https://settings-production.up.railway.app",
     "voice-lab": "https://voice-lab-production.up.railway.app",
     "voice-marketplace": "https://voice-marketplace-production.up.railway.app",
-    "white-label": "https://white-label-production.up.railway.app"
+    "white-label": "https://white-label-production.up.railway.app",
+    
+    # Final 2 services for 100% completion
+    "agents": "https://agents-production.up.railway.app",
+    "ai-agents": "https://ai-agents-production.up.railway.app",
+    
+    # WORLD-CLASS ADDITIONS - Essential for Global AI Leadership
+    "knowledge-base": "https://knowledge-base-production.up.railway.app",
+    "lead-management": "https://lead-management-production.up.railway.app", 
+    "notifications": "https://notifications-production.up.railway.app",
+    "scheduling": "https://scheduling-production.up.railway.app",
+    "scripts": "https://scripts-production.up.railway.app",
+    "webhooks": "https://webhooks-production.up.railway.app"
 }
 
 # Service health check endpoints
@@ -61,7 +73,19 @@ SERVICE_HEALTH_PATHS = {
     "settings": "/health",
     "voice-lab": "/health",
     "voice-marketplace": "/health",
-    "white-label": "/health"
+    "white-label": "/health",
+    
+    # Final 2 services
+    "agents": "/health",
+    "ai-agents": "/health",
+    
+    # World-class AI platform services
+    "knowledge-base": "/health",
+    "lead-management": "/health",
+    "notifications": "/health", 
+    "scheduling": "/health",
+    "scripts": "/health",
+    "webhooks": "/health"
 }
 
 # Service routing configuration
@@ -91,5 +115,17 @@ ROUTE_MAPPINGS = {
     "/api/v1/settings": "settings",
     "/api/v1/voice-lab": "voice-lab",
     "/api/v1/voice-marketplace": "voice-marketplace",
-    "/api/v1/white-label": "white-label"
+    "/api/v1/white-label": "white-label",
+    
+    # Final 2 services for 100% completion
+    "/api/v1/agents-mgmt": "agents",
+    "/api/v1/ai-agents": "ai-agents",
+    
+    # WORLD-CLASS AI PLATFORM ROUTES
+    "/api/v1/knowledge": "knowledge-base",
+    "/api/v1/leads": "lead-management", 
+    "/api/v1/notifications": "notifications",
+    "/api/v1/scheduling": "scheduling",
+    "/api/v1/scripts": "scripts",
+    "/api/v1/webhooks": "webhooks"
 }
