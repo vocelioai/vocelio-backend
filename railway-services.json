@@ -1,0 +1,46 @@
+{
+  "services": {
+    "knowledge-base": {
+      "source": {
+        "type": "github",
+        "repo": "vocelioai/vocelio-backend",
+        "rootDirectory": "/apps/knowledge-base"
+      }
+    },
+    "lead-management": {
+      "source": {
+        "type": "github", 
+        "repo": "vocelioai/vocelio-backend",
+        "rootDirectory": "/apps/lead-management"
+      }
+    },
+    "notifications": {
+      "source": {
+        "type": "github",
+        "repo": "vocelioai/vocelio-backend", 
+        "rootDirectory": "/apps/notifications"
+      }
+    },
+    "scheduling": {
+      "source": {
+        "type": "github",
+        "repo": "vocelioai/vocelio-backend",
+        "rootDirectory": "/apps/scheduling"
+      }
+    },
+    "scripts": {
+      "source": {
+        "type": "github",
+        "repo": "vocelioai/vocelio-backend",
+        "rootDirectory": "/apps/scripts"
+      }
+    },
+    "webhooks": {
+      "source": {
+        "type": "github",
+        "repo": "vocelioai/vocelio-backend",
+        "rootDirectory": "/apps/webhooks"
+      }
+    }
+  }
+}
