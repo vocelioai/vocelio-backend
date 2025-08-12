@@ -49,4 +49,4 @@ EXPOSE 8003
 
 HEALTHCHECK --interval=30s --timeout=5s --retries=3 CMD python -c "import httpx; httpx.get('http://localhost:8003/health')"
 
-CMD ["bash", "-c", "python wait_for_services.py && python main.py"]
+CMD ["python", "main.py"]
