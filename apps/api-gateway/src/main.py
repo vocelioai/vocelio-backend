@@ -1,5 +1,5 @@
 # apps/api-gateway/src/main.py
-from fastapi import FastAPI, Request, Response, HTTPException, Depends, BackgroundTasks
+from fastapi import FastAPI, Request, Response, HTTPException, Depends, BackgroundTasks, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import httpx
@@ -70,6 +70,15 @@ SERVICES = {
     "overview-service": os.getenv("OVERVIEW_SERVICE_URL", "http://overview-service:8001"),
     "ai-agents-service": os.getenv("AI_AGENTS_SERVICE_URL", "http://ai-agents-service:8002"),
     "smart-campaigns-service": os.getenv("SMART_CAMPAIGNS_SERVICE_URL", "http://smart-campaigns-service:8003"),
+    # Dashboard Integration Services
+    "overview": os.getenv("OVERVIEW_SERVICE_URL", "https://overview-production.up.railway.app"),
+    "agent-store": os.getenv("AGENT_STORE_SERVICE_URL", "https://agent-store-production.up.railway.app"),
+    "ai-brain": os.getenv("AI_BRAIN_SERVICE_URL", "https://ai-brain-production.up.railway.app"),
+    "billing-pro": os.getenv("BILLING_PRO_SERVICE_URL", "https://billing-pro-production.up.railway.app"),
+    "flow-builder": os.getenv("FLOW_BUILDER_SERVICE_URL", "https://flow-builder-production.up.railway.app"),
+    "phone-numbers": os.getenv("PHONE_NUMBERS_SERVICE_URL", "https://phone-numbers-production.up.railway.app"),
+    "white-label": os.getenv("WHITE_LABEL_SERVICE_URL", "https://white-label-production-ab67.up.railway.app"),
+    "ai-agents": os.getenv("AI_AGENTS_SERVICE_URL", "https://ai-agents-service-production.up.railway.app"),
 }
 
 # Initialize service discovery and load balancer
@@ -107,7 +116,15 @@ async def root():
         "services": {
             "overview-service": "📊 Command Center Dashboard",
             "ai-agents-service": "🤖 AI Agent Management",
-            "smart-campaigns-service": "� Smart Campaign Engine"
+            "smart-campaigns-service": "🎯 Smart Campaign Engine",
+            "overview": "📊 Dashboard Integration API",
+            "agent-store": "🛒 AI Agent Marketplace",
+            "ai-brain": "🧠 AI Processing Engine",
+            "billing-pro": "💰 Billing & Payments",
+            "flow-builder": "🔧 Conversation Flow Builder",
+            "phone-numbers": "📞 Phone Number Management",
+            "white-label": "🏷️ White Label Solutions",
+            "ai-agents": "🤖 AI Agent Services"
         },
         "features": {
             "ai_brain": "✅ GPT-4 + Multi-Model Support",
@@ -123,6 +140,149 @@ async def root():
         "docs": f"{os.getenv('RAILWAY_STATIC_URL', 'http://localhost:8000')}/docs",
         "timestamp": datetime.utcnow().isoformat()
     }
+
+# Test endpoint to verify deployment
+@app.get("/api/v1/test", tags=["Test"])
+async def test_endpoint():
+    """Test endpoint to verify deployment is working"""
+    return {
+        "status": "success",
+        "message": "✅ Updated API Gateway is deployed and working!",
+        "timestamp": datetime.utcnow().isoformat(),
+        "version": "2024-08-12-latest"
+    }
+
+# Twilio integration endpoints - Direct implementation
+@app.get("/api/v1/twilio/available-phone-numbers/{country_code}/{type}", tags=["Twilio Integration"])
+async def get_twilio_available_numbers(
+    country_code: str,
+    type: str,
+    area_code: Optional[str] = Query(None),
+    contains: Optional[str] = Query(None),
+    page_size: int = Query(20, le=1000)
+):
+    """Get available phone numbers from Twilio"""
+    from integrations.twilio_service import get_available_phone_numbers
+    return await get_available_phone_numbers(country_code, type, area_code, contains, page_size)
+
+@app.post("/api/v1/twilio/incoming-phone-numbers", tags=["Twilio Integration"])
+async def purchase_twilio_number(phone_number: str, webhook_url: Optional[str] = None):
+    """Purchase a phone number from Twilio"""
+    from integrations.twilio_service import purchase_phone_number
+    return await purchase_phone_number(phone_number, webhook_url)
+
+@app.get("/api/v1/twilio/incoming-phone-numbers", tags=["Twilio Integration"])
+async def list_twilio_numbers():
+    """List all purchased phone numbers"""
+    from integrations.twilio_service import list_phone_numbers
+    return await list_phone_numbers()
+
+# Twilio API routing - route to phone-numbers service
+@app.api_route("/api/v1/twilio/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH"])
+async def twilio_route(
+    path: str, 
+    request: Request,
+    background_tasks: BackgroundTasks
+):
+    """Route Twilio API requests to phone-numbers service with fallback to direct handling"""
+    
+    # Handle available phone numbers request directly
+    if path.startswith("available-phone-numbers/"):
+        parts = path.split("/")
+        if len(parts) >= 3:
+            country_code = parts[1]
+            number_type = parts[2]
+            
+            # Get query parameters
+            query_params = dict(request.query_params)
+            area_code = query_params.get("area_code")
+            contains = query_params.get("contains")
+            page_size = int(query_params.get("page_size", 20))
+            
+            from integrations.twilio_service import get_available_phone_numbers
+            return await get_available_phone_numbers(country_code, number_type, area_code, contains, page_size)
+    
+    service_name = "phone-numbers"
+    
+    try:
+        # Get optimal service URL using load balancer
+        service_url = await load_balancer.get_service_url(service_name)
+        target_url = f"{service_url}/api/v1/twilio/{path}"
+        
+        # Prepare headers (remove host header to avoid conflicts)
+        headers = dict(request.headers)
+        headers.pop("host", None)
+        headers["X-Forwarded-For"] = request.client.host
+        headers["X-Gateway-Version"] = "2.0.0"
+        headers["X-Service-Route"] = service_name
+        headers["X-Twilio-Route"] = "true"
+        
+        # Get request body
+        body = await request.body()
+        
+        # Log request for analytics
+        logger.info(f"🔄 Routing Twilio request: {request.method} /api/v1/twilio/{path} → {service_name}")
+        
+        # Make request to target service with timeout and retry logic
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            try:
+                response = await client.request(
+                    method=request.method,
+                    url=target_url,
+                    headers=headers,
+                    content=body,
+                    params=dict(request.query_params)
+                )
+                
+                # Log successful response
+                logger.info(
+                    f"✅ Twilio request completed: {service_name} - {response.status_code} - {response.elapsed.total_seconds():.3f}s"
+                )
+                
+                # Return response with additional headers
+                response_headers = dict(response.headers)
+                response_headers["X-Service-Name"] = service_name
+                response_headers["X-Service-Response-Time"] = str(response.elapsed.total_seconds())
+                response_headers["X-Twilio-Gateway"] = "true"
+                
+                return Response(
+                    content=response.content,
+                    status_code=response.status_code,
+                    headers=response_headers,
+                    media_type=response_headers.get("content-type", "application/json")
+                )
+                
+            except httpx.TimeoutException:
+                logger.error(f"⏰ Timeout calling {service_name} service for Twilio request")
+                raise HTTPException(
+                    status_code=504,
+                    detail={
+                        "error": "Service timeout",
+                        "service": service_name,
+                        "message": "The Twilio service took too long to respond. Please try again."
+                    }
+                )
+                
+            except httpx.ConnectError:
+                logger.error(f"🔌 Connection error to {service_name} service for Twilio request")
+                raise HTTPException(
+                    status_code=503,
+                    detail={
+                        "error": "Service unavailable",
+                        "service": service_name,
+                        "message": "Cannot connect to the Twilio service. Please try again later."
+                    }
+                )
+                
+    except Exception as e:
+        logger.error(f"💥 Error in Twilio routing: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "error": "Internal gateway error",
+                "message": "Failed to route Twilio request"
+            }
+        )
 
 # Main service routing endpoint
 @app.api_route("/api/{service_name}/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH"])

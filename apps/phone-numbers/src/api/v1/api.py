@@ -1,7 +1,7 @@
 # apps/phone-numbers/src/api/v1/api.py
 from fastapi import APIRouter
 
-from api.v1.endpoints import numbers, purchase, verification, webhooks
+from api.v1.endpoints import numbers, purchase, webhooks, twilio_integration
 
 api_router = APIRouter()
 
@@ -21,16 +21,16 @@ api_router.include_router(
 )
 
 api_router.include_router(
-    verification.router,
-    prefix="/verification",
-    tags=["Number Verification"],
-    responses={404: {"description": "Not found"}}
-)
-
-api_router.include_router(
     webhooks.router,
     prefix="/webhooks",
     tags=["Webhooks"],
+    responses={404: {"description": "Not found"}}
+)
+
+# Twilio Integration endpoints
+api_router.include_router(
+    twilio_integration.router,
+    tags=["Twilio Integration"],
     responses={404: {"description": "Not found"}}
 )
 
