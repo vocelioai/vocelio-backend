@@ -5,7 +5,7 @@ import structlog
 
 from api.v1.router import router as api_router
 from core.config import get_settings
-from shared.middleware.error_handling import add_error_handlers
+from shared.middleware.error_handling import add_error_handling
 
 logger = structlog.get_logger()
 
@@ -34,7 +34,7 @@ def create_app() -> FastAPI:
     app.mount("/static", StaticFiles(directory="static"), name="static")
 
     # Add error handlers
-    add_error_handlers(app)
+    add_error_handling(app)
 
     # Include API routes
     app.include_router(api_router, prefix="/api/v1")

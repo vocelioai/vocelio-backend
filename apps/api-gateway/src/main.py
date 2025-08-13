@@ -32,7 +32,7 @@ except ImportError:  # Fallback to absolute imports if relative fails
     from routes.proxy import router as proxy_router
     from utils.service_discovery import ServiceDiscovery
     from utils.load_balancer import LoadBalancer
-    from config import settings
+    from .config import settings
 
 # Configure logging
 logging.basicConfig(

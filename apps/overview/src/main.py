@@ -42,7 +42,7 @@ async def lifespan(app: FastAPI):
     
     try:
         # Initialize database
-        await init_database()
+        init_database()
         logger.info("✅ Database initialized")
         
         # Initialize services
@@ -118,10 +118,10 @@ async def health_check():
     try:
         # Check database connection
         from shared.database.client import get_database
-        db = await get_database()
+        db = get_database()
         
         # Test database query
-        result = await db.from_("organizations").select("id").limit(1).execute()
+        connection_ok = await db.test_connection()
         
         return {
             "status": "healthy",

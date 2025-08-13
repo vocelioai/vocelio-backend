@@ -165,8 +165,22 @@ from fastapi import Request, HTTPException, status
 from typing import Dict
 import time
 from collections import defaultdict, deque
+import os
 
-from core.config import settings
+# Simple settings for shared middleware
+class SharedSettings:
+    """Minimal settings for shared middleware"""
+    JWT_SECRET_KEY: str = os.getenv("JWT_SECRET_KEY", "default-jwt-secret")
+    JWT_ALGORITHM: str = os.getenv("JWT_ALGORITHM", "HS256")
+    SECRET_KEY: str = os.getenv("SECRET_KEY", "default-secret-key")
+    ALGORITHM: str = os.getenv("JWT_ALGORITHM", "HS256")
+    RATE_LIMIT_REQUESTS: int = int(os.getenv("RATE_LIMIT_REQUESTS", "1000"))
+    RATE_LIMIT_WINDOW: int = int(os.getenv("RATE_LIMIT_WINDOW", "3600"))
+    DATABASE_URL: str = os.getenv("DATABASE_URL", "postgresql://postgres:password@localhost:5432/vocelio")
+    DATABASE_POOL_SIZE: int = int(os.getenv("DATABASE_POOL_SIZE", "10"))
+    DATABASE_MAX_OVERFLOW: int = int(os.getenv("DATABASE_MAX_OVERFLOW", "20"))
+
+settings = SharedSettings()
 
 
 class RateLimiter:
@@ -228,7 +242,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import JWTError, jwt
 from typing import Dict, Any
 
-from core.config import settings
+# Use the shared settings already defined above
 
 security = HTTPBearer()
 
@@ -249,7 +263,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
             algorithms=[settings.ALGORITHM]
         )
         
-        user_id: str = payload.get("sub")
+        user_id = payload.get("sub")
         if user_id is None:
             raise credentials_exception
         
@@ -308,7 +322,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 from typing import Generator
 
-from core.config import settings
+# Use the shared settings already defined above
 
 # Create database engine
 engine = create_engine(

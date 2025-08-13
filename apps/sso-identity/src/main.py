@@ -314,7 +314,7 @@ def log_audit_event(
 
 async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security),
-    request: Request = None
+    request: Optional[Request] = None
 ) -> User:
     """Get the current authenticated user"""
     try:
@@ -333,7 +333,7 @@ async def get_current_user(
         raise HTTPException(status_code=401, detail="Invalid authentication token")
 
 async def get_current_tenant(user: User = Depends(get_current_user)) -> Tenant:
-    """Get the current user's tenant"""
+    # Get the current user's tenant
     tenant = tenants_db.get(user.tenant_id)
     if tenant is None:
         raise HTTPException(status_code=404, detail="Tenant not found")
@@ -423,6 +423,9 @@ async def login(login_request: LoginRequest, request: Request):
     
     # Check tenant domain if provided
     tenant = tenants_db.get(user.tenant_id)
+    if not tenant:
+        raise HTTPException(status_code=500, detail="Tenant not found")
+        
     if (login_request.tenant_domain and 
         tenant.domain != login_request.tenant_domain):
         raise HTTPException(status_code=401, detail="Invalid tenant domain")
@@ -484,7 +487,7 @@ async def login(login_request: LoginRequest, request: Request):
 async def logout(
     session_id: str,
     user: User = Depends(get_current_user),
-    request: Request = None
+    request: Optional[Request] = None
 ):
     """Logout user and terminate session"""
     session = sessions_db.get(session_id)

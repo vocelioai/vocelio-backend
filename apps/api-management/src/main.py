@@ -108,7 +108,7 @@ class API(BaseModel):
 class APIEndpoint(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     api_id: str
-    path: str = Field(..., regex=r'^/.*')
+    path: str = Field(..., pattern=r'^/.*')
     method: HTTPMethod
     description: Optional[str] = None
     is_active: bool = True
@@ -285,7 +285,7 @@ async def proxy_request(
     api: API,
     endpoint: APIEndpoint,
     request: Request,
-    path_params: Dict[str, str] = None
+    path_params: Optional[Dict[str, str]] = None
 ) -> Response:
     """Proxy request to upstream API"""
     # Build target URL
@@ -332,7 +332,7 @@ async def proxy_request(
         logger.error(f"Proxy error: {str(e)}")
         raise HTTPException(status_code=502, detail="Bad gateway")
 
-def validate_api_key(api_key: str, api_id: str = None) -> Optional[APIKey]:
+def validate_api_key(api_key: str, api_id: Optional[str] = None) -> Optional[APIKey]:
     """Validate API key and check permissions"""
     key_obj = None
     for key in api_keys_db.values():
@@ -353,7 +353,7 @@ def validate_api_key(api_key: str, api_id: str = None) -> Optional[APIKey]:
     
     return key_obj
 
-def log_api_usage(
+async def log_api_usage(
     api: API,
     endpoint: APIEndpoint,
     request: Request,
@@ -656,7 +656,7 @@ async def gateway_proxy(
     response_time_ms = (time.time() - start_time) * 1000
     
     # Log usage
-    log_api_usage(target_api, target_endpoint, request, response, api_key_obj, response_time_ms)
+    await log_api_usage(target_api, target_endpoint, request, response, api_key_obj, response_time_ms)
     
     return response
 
@@ -685,7 +685,7 @@ async def get_usage_analytics(
     avg_response_time = sum(u.response_time_ms for u in tenant_usage) / total_requests if total_requests > 0 else 0
     
     # Group by API
-    api_stats = defaultdict(lambda: {"requests": 0, "errors": 0, "avg_response_time": 0})
+    api_stats = defaultdict(lambda: {"requests": 0, "errors": 0, "avg_response_time": 0.0})
     for usage in tenant_usage:
         api_stats[usage.api_id]["requests"] += 1
         if usage.response_status >= 400:
