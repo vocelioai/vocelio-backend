@@ -1,5 +1,5 @@
-# 🤖 Vocelio.ai AI Agents Service
-# Proven FastAPI 0.112.2 compatible dependencies
+# 🤖 Vocelio.ai AI Agents Service - MERGED & ENHANCED
+# Proven FastAPI 0.112.2 compatible dependencies with AI capabilities
 
 # Core FastAPI Stack (Proven working)
 -c ../../constraints.txt
@@ -10,6 +10,10 @@ httpx
 pydantic
 pydantic-core
 python-dotenv
+
+# AI Model Integration (Optional - graceful degradation if not available)
+# openai>=1.0.0
+# anthropic>=0.8.0
 
 # Authentication
 PyJWT

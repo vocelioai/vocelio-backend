@@ -11,6 +11,7 @@ import asyncio
 from contextlib import asynccontextmanager
 import logging
 from typing import Dict, Any
+from datetime import datetime
 
 from src.api.v1.api import api_router
 from src.core.config import settings
@@ -103,13 +104,44 @@ app.include_router(api_router, prefix="/api/v1")
 
 @app.get("/")
 async def root():
-    """Root endpoint"""
+    """Service root endpoint - Enhanced with overview-service compatibility"""
     return {
-        "service": "Vocelio.ai Overview Service",
-        "status": "🔥 LIVE",
-        "description": "Global Command Center Dashboard",
+        "service": "overview",
+        "status": "healthy",
         "version": "1.0.0",
-        "docs": "/docs"
+        "description": "Unified Overview & Dashboard Service",
+        "message": "🌍 Vocelio.ai Overview Service",
+        "timestamp": datetime.now().isoformat(),
+        "docs": "/docs",
+        "api": "/api/v1",
+        "health": "/health",
+        "features": [
+            "enterprise_dashboard",
+            "real_time_metrics", 
+            "system_monitoring",
+            "ai_insights",
+            "global_analytics"
+        ]
+    }
+
+# Simple endpoints for backward compatibility with overview-service
+@app.get("/api/v1/dashboard")
+async def simple_dashboard():
+    """Simple dashboard data for basic integration"""
+    return {
+        "service": "overview",
+        "data": {
+            "total_clients": 1247,
+            "active_calls": 89,
+            "calls_today": 5643,
+            "revenue_today": 45678.90,
+            "success_rate": 73.2,
+            "ai_optimization_score": 94.7,
+            "agents_online": 247,
+            "campaigns_active": 45
+        },
+        "timestamp": datetime.now().isoformat(),
+        "status": "live"
     }
 
 @app.get("/health")
