@@ -2,11 +2,11 @@
 builder = "NIXPACKS"
 
 [deploy]
-startCommand = "python simple_main.py"
+startCommand = "python call_center_main.py"
 healthcheckPath = "/health"
 healthcheckTimeout = 300
-
 watchPaths = ["apps/call-center/**"]
+
 [env]
-PORT = "8000"
+PORT = "8002"
 ENVIRONMENT = "production"
