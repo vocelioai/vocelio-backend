@@ -27,7 +27,7 @@ settings = get_settings()
 async def lifespan(app: FastAPI):
     """Application lifespan manager"""
     # Startup
-    logger.info("🚀 Smart Campaigns Service starting up...")
+    logger.info("🚀 Enhanced Smart Campaigns Service starting up...")
     
     # Initialize database connection
     try:
@@ -38,39 +38,35 @@ async def lifespan(app: FastAPI):
         raise
     
     # Initialize any background tasks or connections here
-    logger.info("🎯 Smart Campaigns Service ready!")
+    logger.info("🎯 Enhanced Smart Campaigns Service with AI optimization ready!")
     
     yield
     
     # Shutdown
-    logger.info("🛑 Smart Campaigns Service shutting down...")
+    logger.info("🛑 Enhanced Smart Campaigns Service shutting down...")
     # Cleanup tasks here
-    logger.info("✅ Smart Campaigns Service stopped")
+    logger.info("✅ Enhanced Smart Campaigns Service stopped")
 
 # Create FastAPI app
 app = FastAPI(
-    title="Vocelio.ai Smart Campaigns API",
-    description="🎯 Advanced AI-powered campaign management with smart targeting and optimization",
-    version="1.0.0",
+    title="Vocelio.ai Enhanced Smart Campaigns API",
+    description="🎯 Advanced AI-powered campaign management with smart targeting, optimization, and 89+ campaign templates",
+    version="2.0.0",
     docs_url="/docs" if settings.ENVIRONMENT != "production" else None,
     redoc_url="/redoc" if settings.ENVIRONMENT != "production" else None,
     lifespan=lifespan,
     openapi_tags=[
         {
-            "name": "campaigns",
-            "description": "Campaign management operations",
+            "name": "enhanced-campaigns",
+            "description": "Enhanced campaign management with AI optimization",
+        },
+        {
+            "name": "campaigns-legacy",
+            "description": "Legacy campaign management (backward compatibility)",
         },
         {
             "name": "prospects",
             "description": "Prospect management and targeting",
-        },
-        {
-            "name": "scheduling",
-            "description": "Campaign scheduling and automation",
-        },
-        {
-            "name": "automation",
-            "description": "AI-powered campaign automation",
         },
         {
             "name": "analytics",
@@ -93,9 +89,6 @@ app.add_middleware(
 )
 
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.ALLOWED_HOSTS)
-app.add_middleware(RequestLoggingMiddleware)
-app.add_middleware(ErrorHandlingMiddleware)
-app.add_middleware(MetricsMiddleware, service_name="smart-campaigns")
 
 # Include API router
 app.include_router(api_router, prefix="/api/v1")
@@ -106,17 +99,31 @@ async def health_check():
     """Health check endpoint for load balancer"""
     return {
         "status": "healthy",
-        "service": "smart-campaigns",
-        "version": "1.0.0",
-        "environment": settings.ENVIRONMENT
+        "service": "smart-campaigns-enhanced",
+        "version": "2.0.0",
+        "environment": settings.ENVIRONMENT,
+        "features": [
+            "AI Optimization",
+            "A/B Testing",
+            "Advanced Analytics", 
+            "89+ Campaign Templates",
+            "Performance Tracking"
+        ]
     }
 
 @app.get("/")
 async def root():
     """Root endpoint"""
     return {
-        "message": "🎯 Vocelio.ai Smart Campaigns API",
-        "version": "1.0.0",
+        "message": "🎯 Vocelio.ai Enhanced Smart Campaigns API",
+        "version": "2.0.0",
+        "features": [
+            "Unified campaign management from 2 services",
+            "AI-powered optimization",
+            "A/B testing capabilities",
+            "89+ pre-built campaign templates",
+            "Advanced performance analytics"
+        ],
         "docs_url": "/docs",
         "health_url": "/health"
     }
