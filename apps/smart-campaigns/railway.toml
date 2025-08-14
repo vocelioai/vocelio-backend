@@ -12,6 +12,7 @@ numReplicas = 1
 sleepApplication = false
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 3
+watchPaths = ["apps/smart-campaigns/**"]
 
 [env]
 PYTHONUNBUFFERED = "1"

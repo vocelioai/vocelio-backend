@@ -12,6 +12,7 @@ numReplicas = 1
 sleepApplication = false
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 3
+watchPaths = ["apps/ai-agents-service/**"]
 
 [env]
 PYTHONUNBUFFERED = "1"

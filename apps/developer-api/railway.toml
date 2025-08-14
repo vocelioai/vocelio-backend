@@ -5,6 +5,7 @@ builder = "NIXPACKS"
 startCommand = "python main.py"
 healthcheckPath = "/health"
 
+watchPaths = ["apps/developer-api/**"]
 [env]
 PORT = "8000"
 ENVIRONMENT = "production"
