@@ -2,8 +2,9 @@
 builder = "NIXPACKS"
 
 [deploy]
-startCommand = "python main.py"
+startCommand = "python simple_main.py"
 healthcheckPath = "/health"
+healthcheckTimeout = 300
 
 [env]
 PORT = "8000"
