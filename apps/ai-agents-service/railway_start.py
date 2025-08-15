@@ -31,10 +31,10 @@ def main():
     print(f"🛍️ Agent Marketplace: 200+ agents available")
     print(f"🔧 Enhanced Features: Analytics, Performance Tracking, Advanced Management")
     
-    # Import and run the FastAPI app - try main.py first
+    # Import and run the FastAPI app - Force src/main.py (Enhanced AI Agents Service)
     try:
-        from main import app
-        print("✅ Using main.py as entry point")
+        from src.main import app
+        print("✅ Using src/main.py (Enhanced AI Agents Service) as entry point")
         
         uvicorn.run(
             app,
@@ -45,23 +45,18 @@ def main():
             use_colors=False  # Better for Railway logs
         )
         
-    except ImportError:
-        try:
-            # Fallback to src/main.py
-            from src.main import app
-            print("✅ Using src/main.py as entry point")
-            
-            uvicorn.run(
-                app,
-                host=host,
-                port=port,
-                log_level=os.getenv("LOG_LEVEL", "info").lower(),
-                access_log=True,
-                use_colors=False
-            )
-        except ImportError as e:
-            print(f"❌ Could not import app: {e}")
-            sys.exit(1)
+    except ImportError as e:
+        print(f"❌ CRITICAL: Enhanced AI Agents Service src/main.py not found: {e}")
+        print("❌ DO NOT use root main.py - that's the API Gateway!")
+        print("Available files in current directory:")
+        import os
+        for f in os.listdir("."):
+            print(f"  - {f}")
+        if os.path.exists("src"):
+            print("Files in src directory:")
+            for f in os.listdir("src"):
+                print(f"  - src/{f}")
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()
