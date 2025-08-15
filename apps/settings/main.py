@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-settings Service for Vocelio.ai
+Settings Service for Vocelio.ai
+Enhanced with advanced configuration management capabilities
 """
 
 import os
@@ -10,13 +11,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
 import uvicorn
 
+# Import enhanced endpoint routers
+from src.api.v1.endpoints.advanced_configuration import router as advanced_config_router
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI(
-    title=f"settings Service",
-    version="1.0.0",
-    description=f"Vocelio.ai settings microservice"
+    title=f"Settings Service - Enhanced v2.0.0",
+    version="2.0.0",
+    description=f"Vocelio.ai enhanced settings microservice with enterprise-grade configuration management"
 )
 
 app.add_middleware(
@@ -27,12 +31,22 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Include enhanced configuration endpoints
+app.include_router(advanced_config_router, prefix="/api/v1", tags=["Advanced Configuration"])
+
 @app.get("/")
 async def root():
     return {
         "service": "settings",
         "status": "operational",
-        "version": "1.0.0",
+        "version": "2.0.0",
+        "enhanced_features": [
+            "Configuration templates",
+            "Multi-environment management", 
+            "Compliance governance",
+            "Advanced automation rules",
+            "Configuration analytics"
+        ],
         "timestamp": datetime.utcnow().isoformat()
     }
 
@@ -41,7 +55,14 @@ async def health_check():
     return {
         "status": "healthy",
         "service": "settings",
-        "version": "1.0.0",
+        "version": "2.0.0",
+        "capabilities": {
+            "advanced_configuration": True,
+            "multi_environment": True,
+            "compliance_governance": True,
+            "automation_rules": True,
+            "analytics": True
+        },
         "timestamp": datetime.utcnow().isoformat(),
         "environment": os.getenv("ENVIRONMENT", "development")
     }

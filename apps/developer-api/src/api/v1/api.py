@@ -1,6 +1,6 @@
 # apps/developer-api/src/api/v1/api.py
 from fastapi import APIRouter
-from api.v1.endpoints import keys, webhooks, sdk, documentation, testing
+from api.v1.endpoints import keys, webhooks, sdk, documentation, testing, advanced_sdk, developer_tools
 
 api_router = APIRouter()
 
@@ -10,3 +10,7 @@ api_router.include_router(webhooks.router, prefix="/webhooks", tags=["Webhooks"]
 api_router.include_router(sdk.router, prefix="/sdk", tags=["SDK"])
 api_router.include_router(documentation.router, prefix="/docs", tags=["Documentation"])
 api_router.include_router(testing.router, prefix="/test", tags=["Testing"])
+
+# Enhanced Developer API endpoints
+api_router.include_router(advanced_sdk.router, tags=["Advanced SDK"])
+api_router.include_router(developer_tools.router, tags=["Developer Tools"])
