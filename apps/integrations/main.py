@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
 integrations Service for Vocelio.ai
+Enterprise Integration Platform & API Marketplace
 """
 
 import os
@@ -10,13 +11,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
 import uvicorn
 
+# Import enhanced API endpoints
+from src.api.v1.endpoints import enterprise_integrations, api_marketplace
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI(
-    title=f"integrations Service",
-    version="1.0.0",
-    description=f"Vocelio.ai integrations microservice"
+    title="Integrations Service - Enterprise Integration Platform",
+    version="2.0.0",
+    description="Vocelio.ai Integrations microservice with enterprise-grade third-party integrations, API marketplace, custom connectors, and advanced data synchronization"
 )
 
 app.add_middleware(
@@ -26,6 +30,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Include enhanced API routers
+app.include_router(enterprise_integrations.router, prefix="/api/v1")
+app.include_router(api_marketplace.router, prefix="/api/v1")
 
 @app.get("/")
 async def root():
