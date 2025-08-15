@@ -33,9 +33,10 @@ def main():
     print(f"⚡ Redis Cache: 94.7% hit rate optimization")
     print(f"🔄 Background Tasks: Advanced health monitoring")
     
-    # Import and run the FastAPI app
+    # Import and run the FastAPI app - try src/main.py first for enhanced version
     try:
         from src.main import app
+        print("✅ Using enhanced src/main.py as entry point")
         
         uvicorn.run(
             app,
@@ -47,17 +48,22 @@ def main():
         )
         
     except ImportError:
-        # Fallback to main.py in root if src structure doesn't work
-        from main import app
-        
-        uvicorn.run(
-            app,
-            host=host,
-            port=port,
-            log_level=os.getenv("LOG_LEVEL", "info").lower(),
-            access_log=True,
-            use_colors=False
-        )
+        try:
+            # Fallback to main.py in root
+            from main import app
+            print("✅ Using main.py as entry point")
+            
+            uvicorn.run(
+                app,
+                host=host,
+                port=port,
+                log_level=os.getenv("LOG_LEVEL", "info").lower(),
+                access_log=True,
+                use_colors=False
+            )
+        except ImportError as e:
+            print(f"❌ Could not import app: {e}")
+            sys.exit(1)
 
 if __name__ == "__main__":
     main()
