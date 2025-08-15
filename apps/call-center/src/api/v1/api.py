@@ -1,6 +1,6 @@
 # apps/call-center/src/api/v1/api.py
 from fastapi import APIRouter
-from api.v1.endpoints import calls, webhooks, transfer, recording
+from api.v1.endpoints import calls, webhooks, transfer, recording, dialer, inbound, phone_system, analytics, agents
 
 api_router = APIRouter()
 
@@ -9,6 +9,13 @@ api_router.include_router(calls.router, prefix="/calls", tags=["calls"])
 api_router.include_router(webhooks.router, prefix="/webhooks", tags=["webhooks"])
 api_router.include_router(transfer.router, prefix="/transfer", tags=["transfer"])
 api_router.include_router(recording.router, prefix="/recording", tags=["recording"])
+
+# NEW: Enhanced call center functionality
+api_router.include_router(dialer.router, prefix="/dialer", tags=["auto-dialer"])
+api_router.include_router(inbound.router, prefix="/inbound", tags=["inbound-center"])
+api_router.include_router(phone_system.router, prefix="/phone-system", tags=["phone-system"])
+api_router.include_router(analytics.router, prefix="/analytics", tags=["analytics"])
+api_router.include_router(agents.router, prefix="/agents", tags=["agents"])
 
 ---
 
