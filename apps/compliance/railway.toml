@@ -1,11 +1,57 @@
+# apps/compliance/railway.toml
+# Enhanced Compliance & Audit Service v2.0.0
+
 [build]
 builder = "NIXPACKS"
 
 [deploy]
-startCommand = "python main.py"
+# Use Python script to handle PORT variable properly
+startCommand = "python railway_start.py"
 healthcheckPath = "/health"
-
+healthcheckTimeout = 30
+numReplicas = 1
+sleepApplication = false
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
 watchPaths = ["apps/compliance/**"]
+
 [env]
-PORT = "8000"
+PYTHONUNBUFFERED = "1"
+PYTHONDONTWRITEBYTECODE = "1"
+PYTHONPATH = "."
+LOG_level = "INFO"
 ENVIRONMENT = "production"
+
+[env]
+# Service Configuration
+SERVICE_NAME = "enhanced-compliance"
+SERVICE_VERSION = "2.0.0"
+ENVIRONMENT = "production"
+
+# Database
+DATABASE_URL = "${{PostgreSQL.DATABASE_URL}}"
+
+# Redis Cache
+REDIS_URL = "${{Redis.REDIS_URL}}"
+
+# Compliance Configuration
+COMPLIANCE_FRAMEWORKS_ENABLED = "GDPR,SOX,HIPAA,PCI_DSS,ISO27001,NIST,FISMA,CCPA,FCC_PART_64,EPRIVACY,CRTC,FERPA,GLBA,COSO,COBIT"
+AUDIT_RETENTION_YEARS = "7"
+RISK_SCORING_ENABLED = "true"
+INCIDENT_TRACKING_ENABLED = "true"
+GDPR_MODULE_ENABLED = "true"
+TELECOM_COMPLIANCE_ENABLED = "true"
+
+# External Services
+NOTIFICATION_SERVICE_URL = "${{NOTIFICATION_SERVICE_URL}}"
+ANALYTICS_SERVICE_URL = "${{ANALYTICS_SERVICE_URL}}"
+USER_SERVICE_URL = "${{USER_SERVICE_URL}}"
+
+# Security
+ENCRYPTION_KEY = "${{ENCRYPTION_KEY}}"
+JWT_SECRET = "${{JWT_SECRET}}"
+
+# Reporting
+REPORT_GENERATION_ENABLED = "true"
+REPORT_FORMATS = "PDF,CSV,JSON,XLSX"
+REPORT_STORAGE_PATH = "/tmp/compliance_reports"

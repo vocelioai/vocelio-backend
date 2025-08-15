@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Railway deployment startup script for Enhanced Smart Campaigns Service v2.0.0
-Handles Railway environment variables and campaign management platform
+Railway deployment startup script for Enhanced Compliance Service
+Handles Railway environment variables and port configuration
 """
 
 import os
@@ -25,12 +25,11 @@ def main():
     os.environ.setdefault("ENVIRONMENT", "production")
     os.environ.setdefault("LOG_LEVEL", "INFO")
     
-    print(f"🎯 Starting Enhanced Smart Campaigns Service on {host}:{port}")
+    print(f"🔐 Starting Enhanced Compliance Service on {host}:{port}")
     print(f"📊 Service Version: 2.0.0")
     print(f"🌍 Environment: {os.getenv('ENVIRONMENT', 'production')}")
-    print(f"📋 Campaign Templates: 89+ available")
-    print(f"🧪 A/B Testing: Advanced framework enabled")
-    print(f"🚀 AI Optimization: Real-time analytics and insights")
+    print(f"📋 Compliance Frameworks: 15+ supported")
+    print(f"🔍 Audit Events: 18+ event types")
     
     # Import and run the FastAPI app
     try:
