@@ -4,46 +4,49 @@ Service Discovery and Routing Configuration
 Maps deployed Railway services to the API Gateway
 """
 
-# Add your actual Railway service URLs here
+# Add your actual Vocelio custom domain service URLs here
 DEPLOYED_SERVICES = {
-    # Currently deployed and verified services
-    "team-hub": "https://team-hub-production.up.railway.app",
-    "overview": "https://overview-production.up.railway.app",
-    "api-gateway": "https://api-gateway-production-588d.up.railway.app",
-    "ai-agents": "https://ai-agents-service-production.up.railway.app",
-    "smart-campaigns": "https://smart-campaigns-production.up.railway.app",
-    "phone-numbers": "https://phone-numbers-production.up.railway.app",
-    "analytics-pro": "https://analytics-pro-production.up.railway.app",
+    # Core Foundation Services (7) - Custom vocelio.ai domains
+    "team-hub": "https://team.vocelio.ai",
+    "overview": "https://overview.vocelio.ai", 
+    "api-gateway": "https://api.vocelio.ai",
+    "ai-agents": "https://agents.vocelio.ai",
+    "smart-campaigns": "https://campaigns.vocelio.ai",
+    "phone-numbers": "https://numbers.vocelio.ai",
+    "analytics-pro": "https://analytics.vocelio.ai",
     
-    # Ready to deploy services (have Dockerfile + main.py + requirements.txt)
-    "overview-service": "https://overview-service-production.up.railway.app",
-    "smart-campaigns-service": "https://smart-campaigns-service-production.up.railway.app",
+    # Business Services (6) - Professional branding
+    "overview-service": "https://overview.vocelio.ai",
+    "smart-campaigns-service": "https://campaigns.vocelio.ai",
+    "agent-store": "https://backend.vocelio.ai",
+    "ai-brain": "https://brain.vocelio.ai",
+    "billing-pro": "https://billing.vocelio.ai",
+    "call-center": "https://call.vocelio.ai",
     
-    # Services with main.py + requirements.txt (need Dockerfiles for deployment)
-    "agent-store": "https://agent-store-production.up.railway.app",
-    "ai-brain": "https://ai-brain-production.up.railway.app",
-    "billing-pro": "https://billing-pro-production.up.railway.app",
-    "call-center": "https://call-center-production.up.railway.app",
-    "compliance": "https://compliance-production.up.railway.app",
-    "developer-api": "https://developer-api-production.up.railway.app",
-    "flow-builder": "https://flow-builder-production.up.railway.app",
-    "integrations": "https://integrations-production.up.railway.app",
-    "settings": "https://settings-production.up.railway.app",
-    "voice-lab": "https://voice-lab-production.up.railway.app",
-    "voice-marketplace": "https://voice-marketplace-production.up.railway.app",
-    "white-label": "https://white-label-production.up.railway.app",
+    # Enterprise Features (6) - Custom domains
+    "compliance": "https://compliance.vocelio.ai",
+    "developer-api": "https://developer.vocelio.ai", 
+    "flow-builder": "https://flowbuilder.vocelio.ai",
+    "integrations": "https://integrations.vocelio.ai",
+    "settings": "https://settings.vocelio.ai",
+    "voice-lab": "https://voicelab.vocelio.ai",
+    "voice-marketplace": "https://voicemarketplace.vocelio.ai",
+    "white-label": "https://whitelabel.vocelio.ai",
     
-    # Final 2 services for 100% completion
-    "agents": "https://agents-production.up.railway.app",
-    "ai-agents": "https://ai-agents-production.up.railway.app",
+    # AI & Automation Services (6) - Advanced domains
+    "agents": "https://agents.vocelio.ai",
+    "knowledge-base": "https://knowledge.vocelio.ai",
+    "lead-management": "https://lead.vocelio.ai", 
+    "scheduling": "https://scheduling.vocelio.ai",
+    "data-warehouse": "https://data.vocelio.ai",
+    "identity": "https://identity.vocelio.ai",
+    "security": "https://security.vocelio.ai",
     
-    # WORLD-CLASS ADDITIONS - Essential for Global AI Leadership
-    "knowledge-base": "https://knowledge-base-production.up.railway.app",
-    "lead-management": "https://lead-management-production.up.railway.app", 
-    "notifications": "https://notifications-production.up.railway.app",
-    "scheduling": "https://scheduling-production.up.railway.app",
-    "scripts": "https://scripts-production.up.railway.app",
-    "webhooks": "https://webhooks-production.up.railway.app"
+    # Communication & Compliance (4) - Professional endpoints
+    "notifications": "https://notifications.vocelio.ai",
+    "scripts": "https://scripts.vocelio.ai",
+    "webhooks": "https://webhooks.vocelio.ai",
+    "api-management": "https://apimanagement.vocelio.ai"
 }
 
 # Service health check endpoints

@@ -46,7 +46,7 @@ class Settings(BaseSettings):
         ]
     )
     ALLOWED_HOSTS: List[str] = Field(
-        default=["localhost", "127.0.0.1", "*.vocelio.ai", "*.railway.app"]
+        default=["localhost", "127.0.0.1", "*.vocelio.ai"]
     )
     
     # Database
@@ -73,25 +73,37 @@ class Settings(BaseSettings):
     LOAD_BALANCER_STRATEGY: str = Field(default="round_robin")
     HEALTH_CHECK_INTERVAL: int = Field(default=30)
     
-    # Service URLs (Railway Production Microservices)
-    OVERVIEW_SERVICE_URL: str = Field(default="https://overview-production.up.railway.app")
-    AGENTS_SERVICE_URL: str = Field(default="https://ai-agents-service-production.up.railway.app")
-    CAMPAIGNS_SERVICE_URL: str = Field(default="https://smart-campaigns-production.up.railway.app")
-    CALL_CENTER_SERVICE_URL: str = Field(default="http://call-center:8004")  # Not deployed yet
-    PHONE_NUMBERS_SERVICE_URL: str = Field(default="https://phone-numbers-production.up.railway.app")
-    VOICE_MARKETPLACE_SERVICE_URL: str = Field(default="http://voice-marketplace:8006")  # Not deployed yet
-    VOICE_LAB_SERVICE_URL: str = Field(default="http://voice-lab:8007")  # Not deployed yet
-    FLOW_BUILDER_SERVICE_URL: str = Field(default="http://flow-builder:8008")  # Not deployed yet
-    ANALYTICS_SERVICE_URL: str = Field(default="https://analytics-pro-production.up.railway.app")
-    AI_BRAIN_SERVICE_URL: str = Field(default="http://ai-brain:8010")  # Not deployed yet
-    INTEGRATIONS_SERVICE_URL: str = Field(default="http://integrations:8011")  # Not deployed yet
-    AGENT_STORE_SERVICE_URL: str = Field(default="http://agent-store:8012")  # Not deployed yet
-    BILLING_SERVICE_URL: str = Field(default="http://billing-pro:8013")  # Not deployed yet
-    TEAM_HUB_SERVICE_URL: str = Field(default="https://team-hub-production.up.railway.app")
-    COMPLIANCE_SERVICE_URL: str = Field(default="http://compliance:8015")  # Not deployed yet
-    WHITE_LABEL_SERVICE_URL: str = Field(default="http://white-label:8016")  # Not deployed yet
-    DEVELOPER_API_SERVICE_URL: str = Field(default="http://developer-api:8017")  # Not deployed yet
-    SETTINGS_SERVICE_URL: str = Field(default="http://settings:8018")  # Not deployed yet
+    # Service URLs (Vocelio Custom Domains - Professional Branding)
+    OVERVIEW_SERVICE_URL: str = Field(default="https://overview.vocelio.ai")
+    AGENTS_SERVICE_URL: str = Field(default="https://agents.vocelio.ai")
+    CAMPAIGNS_SERVICE_URL: str = Field(default="https://campaigns.vocelio.ai")
+    CALL_CENTER_SERVICE_URL: str = Field(default="https://call.vocelio.ai")
+    PHONE_NUMBERS_SERVICE_URL: str = Field(default="https://numbers.vocelio.ai")
+    VOICE_MARKETPLACE_SERVICE_URL: str = Field(default="https://voicemarketplace.vocelio.ai")
+    VOICE_LAB_SERVICE_URL: str = Field(default="https://voicelab.vocelio.ai")
+    FLOW_BUILDER_SERVICE_URL: str = Field(default="https://flowbuilder.vocelio.ai")
+    ANALYTICS_SERVICE_URL: str = Field(default="https://analytics.vocelio.ai")
+    AI_BRAIN_SERVICE_URL: str = Field(default="https://brain.vocelio.ai")
+    INTEGRATIONS_SERVICE_URL: str = Field(default="https://integrations.vocelio.ai")
+    AGENT_STORE_SERVICE_URL: str = Field(default="https://backend.vocelio.ai")
+    BILLING_SERVICE_URL: str = Field(default="https://billing.vocelio.ai")
+    TEAM_HUB_SERVICE_URL: str = Field(default="https://team.vocelio.ai")
+    COMPLIANCE_SERVICE_URL: str = Field(default="https://compliance.vocelio.ai")
+    WHITE_LABEL_SERVICE_URL: str = Field(default="https://whitelabel.vocelio.ai")
+    DEVELOPER_API_SERVICE_URL: str = Field(default="https://developer.vocelio.ai")
+    SETTINGS_SERVICE_URL: str = Field(default="https://settings.vocelio.ai")
+    
+    # Additional Enterprise Services
+    KNOWLEDGE_BASE_SERVICE_URL: str = Field(default="https://knowledge.vocelio.ai")
+    LEAD_MANAGEMENT_SERVICE_URL: str = Field(default="https://lead.vocelio.ai")
+    SCHEDULING_SERVICE_URL: str = Field(default="https://scheduling.vocelio.ai")
+    DATA_WAREHOUSE_SERVICE_URL: str = Field(default="https://data.vocelio.ai")
+    IDENTITY_SERVICE_URL: str = Field(default="https://identity.vocelio.ai")
+    SECURITY_SERVICE_URL: str = Field(default="https://security.vocelio.ai")
+    NOTIFICATIONS_SERVICE_URL: str = Field(default="https://notifications.vocelio.ai")
+    SCRIPTS_SERVICE_URL: str = Field(default="https://scripts.vocelio.ai")
+    WEBHOOKS_SERVICE_URL: str = Field(default="https://webhooks.vocelio.ai")
+    API_MANAGEMENT_SERVICE_URL: str = Field(default="https://apimanagement.vocelio.ai")
     
     # External APIs
     OPENAI_API_KEY: str = Field(default="", description="OpenAI API key")
