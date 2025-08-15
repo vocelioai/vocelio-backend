@@ -3,6 +3,7 @@
 from fastapi import APIRouter
 
 from api.v1.endpoints import users, teams, dashboard, invitations, roles
+from api.v1 import advanced_analytics
 
 api_router = APIRouter()
 
@@ -12,6 +13,9 @@ api_router.include_router(teams.router, prefix="/teams", tags=["teams"])
 api_router.include_router(dashboard.router, prefix="/dashboard", tags=["dashboard"])
 api_router.include_router(invitations.router, prefix="/invitations", tags=["invitations"])
 api_router.include_router(roles.router, prefix="/roles", tags=["roles"])
+
+# Enhanced analytics endpoints
+api_router.include_router(advanced_analytics.router, prefix="/advanced", tags=["advanced-analytics"])
 
 # apps/team-hub/src/api/v1/endpoints/invitations.py
 
