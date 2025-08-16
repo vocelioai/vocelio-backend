@@ -4,17 +4,45 @@ Main entry point for the call center microservice
 """
 import os
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Dict, Any, Optional, List
 from fastapi import FastAPI, HTTPException, Request, Form
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import PlainTextResponse
+from fastapi.responses import PlainTextResponse, Response
 from pydantic import BaseModel
 import uvicorn
+
+# Twilio imports for voice integration
+try:
+    from twilio.jwt.access_token import AccessToken
+    from twilio.jwt.access_token.grants import VoiceGrant
+    from twilio.twiml.voice_response import VoiceResponse, Dial
+    from twilio.rest import Client
+    TWILIO_AVAILABLE = True
+except ImportError:
+    TWILIO_AVAILABLE = False
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+if not TWILIO_AVAILABLE:
+    logger.warning("⚠️ Twilio not available - install twilio package for voice features")
+
+# Initialize Twilio Client
+TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID')
+TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN')
+TWILIO_API_KEY = os.getenv('TWILIO_API_KEY')
+TWILIO_API_SECRET = os.getenv('TWILIO_API_SECRET')
+TWILIO_TWIML_APP_SID = os.getenv('TWILIO_TWIML_APP_SID')
+TWILIO_PHONE_NUMBER = os.getenv('TWILIO_PHONE_NUMBER')
+
+if TWILIO_AVAILABLE and TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN:
+    twilio_client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+    logger.info("✅ Twilio client initialized successfully")
+else:
+    twilio_client = None
+    logger.warning("⚠️ Twilio not configured - using demo mode")
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -269,6 +297,218 @@ async def test_voice_endpoint():
     <Say voice="alice">This is a test from Vocelio AI Call Center. The service is working correctly!</Say>
 </Response>"""
     return PlainTextResponse(twiml_response, media_type="application/xml")
+
+# ===========================================
+# VOICE INTEGRATION ENDPOINTS FOR FRONTEND
+# ===========================================
+
+class VoiceTokenRequest(BaseModel):
+    identity: Optional[str] = None
+
+class OutboundCallRequest(BaseModel):
+    to: str
+    from_: Optional[str] = None
+
+@app.post("/api/v1/voice/token")
+async def generate_voice_token(request: VoiceTokenRequest):
+    """Generate Twilio Access Token for Voice SDK"""
+    
+    if not TWILIO_AVAILABLE:
+        raise HTTPException(status_code=501, detail="Twilio not available")
+    
+    try:
+        identity = request.identity or f'user_{int(datetime.utcnow().timestamp())}'
+        
+        if not all([TWILIO_ACCOUNT_SID, TWILIO_API_KEY, TWILIO_API_SECRET, TWILIO_TWIML_APP_SID]):
+            return {
+                'success': False,
+                'error': 'Missing Twilio voice credentials',
+                'required': ['TWILIO_API_KEY', 'TWILIO_API_SECRET', 'TWILIO_TWIML_APP_SID']
+            }
+        
+        # Create access token
+        token = AccessToken(
+            TWILIO_ACCOUNT_SID,
+            TWILIO_API_KEY,
+            TWILIO_API_SECRET,
+            identity=identity,
+            ttl=3600
+        )
+        
+        # Add Voice grant
+        voice_grant = VoiceGrant(
+            outgoing_application_sid=TWILIO_TWIML_APP_SID,
+            incoming_allow=True
+        )
+        
+        token.add_grant(voice_grant)
+        
+        return {
+            'success': True,
+            'token': token.to_jwt(),
+            'identity': identity,
+            'expires_at': (datetime.utcnow() + timedelta(hours=1)).isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Voice token error: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail={
+                'success': False,
+                'error': 'Failed to generate voice token',
+                'message': str(e)
+            }
+        )
+
+@app.post("/api/v1/voice/make-call")
+async def make_outbound_call(request: OutboundCallRequest):
+    """Initiate outbound call"""
+    
+    if not twilio_client:
+        return {
+            'success': False,
+            'error': 'Twilio not configured'
+        }
+    
+    try:
+        to_number = request.to
+        from_number = request.from_ or TWILIO_PHONE_NUMBER
+        
+        if not to_number or not from_number:
+            raise HTTPException(
+                status_code=400,
+                detail={
+                    'success': False,
+                    'error': 'Missing phone numbers'
+                }
+            )
+        
+        # Create call using Twilio client
+        call = twilio_client.calls.create(
+            to=to_number,
+            from_=from_number,
+            url=f"https://call.vocelio.ai/api/v1/voice/twiml/outbound",
+            method='POST'
+        )
+        
+        return {
+            'success': True,
+            'call_sid': call.sid,
+            'status': call.status,
+            'to': to_number,
+            'from': from_number
+        }
+        
+    except Exception as e:
+        logger.error(f"Make call error: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail={
+                'success': False,
+                'error': 'Failed to make call',
+                'message': str(e)
+            }
+        )
+
+@app.post("/api/v1/voice/twiml/outbound")
+async def handle_outbound_twiml(request: Request):
+    """Handle outbound call TwiML"""
+    if not TWILIO_AVAILABLE:
+        return PlainTextResponse("Twilio not available", status_code=501)
+    
+    try:
+        response = VoiceResponse()
+        dial = Dial()
+        dial.client('vocelio_dashboard')
+        response.append(dial)
+        
+        return PlainTextResponse(str(response), media_type="text/xml")
+        
+    except Exception as e:
+        logger.error(f"Outbound TwiML error: {e}")
+        response = VoiceResponse()
+        response.say("Call connection failed.")
+        return PlainTextResponse(str(response), media_type="text/xml")
+
+@app.post("/api/v1/voice/twiml/incoming")
+async def handle_incoming_twiml(request: Request):
+    """Handle incoming call TwiML"""
+    if not TWILIO_AVAILABLE:
+        return PlainTextResponse("Twilio not available", status_code=501)
+    
+    try:
+        form_data = await request.form()
+        from_number = form_data.get('From')
+        response = VoiceResponse()
+        
+        response.say("Welcome to Vocelio. Connecting you now.")
+        
+        dial = Dial()
+        dial.client('vocelio_dashboard')
+        response.append(dial)
+        
+        return PlainTextResponse(str(response), media_type="text/xml")
+        
+    except Exception as e:
+        logger.error(f"Incoming TwiML error: {e}")
+        response = VoiceResponse()
+        response.say("Sorry, all agents are busy.")
+        return PlainTextResponse(str(response), media_type="text/xml")
+
+@app.get("/api/v1/voice/status/{call_sid}")
+async def get_voice_call_status(call_sid: str):
+    """Get call status"""
+    
+    if not twilio_client:
+        return {
+            'success': False,
+            'error': 'Twilio not configured'
+        }
+    
+    try:
+        call = twilio_client.calls(call_sid).fetch()
+        
+        return {
+            'success': True,
+            'call': {
+                'sid': call.sid,
+                'status': call.status,
+                'duration': call.duration,
+                'start_time': call.start_time.isoformat() if call.start_time else None,
+                'end_time': call.end_time.isoformat() if call.end_time else None,
+                'from': call.from_formatted,
+                'to': call.to_formatted
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Call status error: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail={
+                'success': False,
+                'error': 'Failed to get call status',
+                'message': str(e)
+            }
+        )
+
+@app.get("/api/v1/voice/health")
+async def voice_health():
+    """Voice service health check"""
+    return {
+        "service": "voice",
+        "status": "healthy",
+        "twilio_configured": twilio_client is not None,
+        "twilio_available": TWILIO_AVAILABLE,
+        "endpoints": [
+            "/api/v1/voice/token",
+            "/api/v1/voice/make-call", 
+            "/api/v1/voice/status/{call_sid}",
+            "/api/v1/voice/twiml/outbound",
+            "/api/v1/voice/twiml/incoming"
+        ]
+    }
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 8002))

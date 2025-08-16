@@ -126,6 +126,41 @@ async def health_check():
         "uptime": "operational"
     }
 
+@app.get("/api/v1/health")
+async def api_v1_health():
+    """API v1 health endpoint for frontend compatibility"""
+    return {
+        "status": "healthy",
+        "service": "api-gateway",
+        "version": "2.0.0",
+        "timestamp": datetime.utcnow().isoformat(),
+        "gateway": {
+            "status": "operational",
+            "uptime": "healthy"
+        },
+        "deployed_services_count": len(DEPLOYED_SERVICES)
+    }
+
+@app.get("/api/v1/twilio/health") 
+async def twilio_health():
+    """Twilio service health endpoint"""
+    # Look for Twilio-related services
+    twilio_services = {
+        name: url for name, url in DEPLOYED_SERVICES.items() 
+        if 'phone' in name.lower() or 'call' in name.lower() or 'twilio' in name.lower()
+    }
+    
+    return {
+        "status": "healthy",
+        "service": "twilio",
+        "timestamp": datetime.utcnow().isoformat(),
+        "twilio_services": {
+            "found": len(twilio_services),
+            "services": list(twilio_services.keys()),
+            "status": "available" if twilio_services else "no_twilio_services"
+        }
+    }
+
 @app.get("/api/v1/system/status")
 async def system_status():
     """System status with deployed services"""

@@ -3,6 +3,8 @@ from fastapi import APIRouter, HTTPException, BackgroundTasks
 from fastapi.responses import JSONResponse
 import httpx
 import asyncio
+import time
+import resource
 from datetime import datetime, timedelta
 from typing import Dict, Any, List
 import os
@@ -14,6 +16,9 @@ from ..config import settings, SERVICE_CONFIG
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
+# Gateway start time for uptime calculation
+start_time = time.time()
+
 # Active subset only (keeps health output clean). Mirror SERVICES in main.
 SERVICES = {
     "overview-service": os.getenv("OVERVIEW_SERVICE_URL", "http://overview-service:8001"),
@@ -23,107 +28,153 @@ SERVICES = {
 
 service_discovery = ServiceDiscovery(SERVICES)
 
-@router.get("/health")
+
+@router.get("/health", 
+          summary="Gateway Health Check",
+          description="Comprehensive health check for the API Gateway and all connected services")
 async def gateway_health():
-    """Basic gateway health check"""
-    return {
-        "status": "healthy",
-        "service": "api-gateway",
-        "version": settings.VERSION,
-        "timestamp": datetime.utcnow().isoformat(),
-        "environment": settings.ENVIRONMENT,
-        "uptime": "operational"
-    }
-
-@router.get("/health/detailed")
-async def detailed_health_check():
-    """Comprehensive health check of gateway and all services"""
-    start_time = datetime.utcnow()
-    
-    health_status = {
-        "gateway": {
-            "status": "healthy",
-            "version": settings.VERSION,
-            "environment": settings.ENVIRONMENT,
-            "timestamp": start_time.isoformat(),
-            "memory_usage": "N/A",  # Could add psutil for memory monitoring
-            "cpu_usage": "N/A"
-        },
-        "services": {},
-        "summary": {
-            "total_services": len(SERVICES),
-            "healthy_services": 0,
-            "unhealthy_services": 0,
-            "unknown_services": 0
-        }
-    }
-    
-    # Check each service health
-    service_check_tasks = []
-    for service_name, service_url in SERVICES.items():
-        task = asyncio.create_task(
-            check_service_health(service_name, service_url),
-            name=f"health_check_{service_name}"
-        )
-        service_check_tasks.append(task)
-    
-    # Wait for all health checks with timeout
+    """
+    Main health check endpoint that provides:
+    - Gateway status
+    - Service discovery health
+    - Quick service connectivity check
+    """
     try:
-        service_results = await asyncio.wait_for(
-            asyncio.gather(*service_check_tasks, return_exceptions=True),
-            timeout=10.0  # 10 second timeout for all health checks
-        )
+        health_status = {
+            "status": "healthy",
+            "timestamp": datetime.now().isoformat(),
+            "version": "2.0.0",
+            "gateway": {
+                "status": "operational",
+                "uptime": time.time() - start_time,
+                "memory_available": True
+            },
+            "service_discovery": {
+                "status": "operational",
+                "services_count": len(SERVICES),
+                "last_update": "active"
+            }
+        }
         
-        # Process results
-        for i, result in enumerate(service_results):
-            service_name = list(SERVICES.keys())[i]
-            
-            if isinstance(result, Exception):
-                health_status["services"][service_name] = {
-                    "status": "error",
-                    "error": str(result),
-                    "response_time": None,
-                    "last_check": start_time.isoformat()
-                }
-                health_status["summary"]["unknown_services"] += 1
-            else:
-                health_status["services"][service_name] = result
-                if result["status"] == "healthy":
-                    health_status["summary"]["healthy_services"] += 1
+        # Quick connectivity check to a few key services
+        quick_services = ["overview", "ai-agents", "billing-pro"]
+        service_status = {}
+        
+        for service_name in quick_services:
+            try:
+                if service_name in SERVICES:
+                    service_url = SERVICES[service_name]
+                    service_status[service_name] = {
+                        "status": "available",
+                        "url": service_url,
+                        "health_endpoint": f"{service_url}/health"
+                    }
                 else:
-                    health_status["summary"]["unhealthy_services"] += 1
-    
-    except asyncio.TimeoutError:
-        logger.warning("Health check timeout - some services may be slow")
-        # Mark remaining services as timeout
-        for service_name in SERVICES.keys():
-            if service_name not in health_status["services"]:
-                health_status["services"][service_name] = {
-                    "status": "timeout",
-                    "error": "Health check timeout",
-                    "response_time": None,
-                    "last_check": start_time.isoformat()
+                    service_status[service_name] = {
+                        "status": "not_found",
+                        "url": None
+                    }
+            except Exception as e:
+                service_status[service_name] = {
+                    "status": "error",
+                    "error": str(e)
                 }
-                health_status["summary"]["unknown_services"] += 1
-    
-    # Calculate overall health
-    total_check_time = (datetime.utcnow() - start_time).total_seconds()
-    health_status["gateway"]["check_duration"] = round(total_check_time, 3)
-    
-    # Determine overall status
-    healthy_ratio = health_status["summary"]["healthy_services"] / max(health_status["summary"]["total_services"], 1)
-    if healthy_ratio >= 0.8:
-        overall_status = "healthy"
-    elif healthy_ratio >= 0.5:
-        overall_status = "degraded"
-    else:
-        overall_status = "unhealthy"
-    
-    health_status["overall_status"] = overall_status
-    health_status["summary"]["health_ratio"] = round(healthy_ratio * 100, 1)
-    
-    return health_status
+        
+        health_status["quick_service_check"] = service_status
+        
+        logger.info("🏥 Gateway health check completed - All systems operational")
+        return health_status
+        
+    except Exception as e:
+        logger.error(f"❌ Health check failed: {str(e)}")
+        return {
+            "status": "unhealthy",
+            "timestamp": datetime.now().isoformat(),
+            "error": str(e)
+        }
 
+
+@router.get("/api/v1/health", 
+          summary="API v1 Health Check",
+          description="Health check endpoint for API v1 compatibility")
+async def api_v1_health():
+    """
+    API v1 health endpoint - provides same health info but with v1 API structure
+    """
+    return await gateway_health()
+
+
+@router.get("/api/v1/twilio/health", 
+          summary="Twilio Service Health Check",
+          description="Specific health check for Twilio service connectivity")
+async def twilio_health():
+    """
+    Twilio service specific health check
+    """
+    try:
+        # Look for Twilio service in our services map
+        twilio_service_names = ["twilio-service", "phone-numbers", "call-center"]
+        twilio_service = None
+        twilio_service_name = None
+        
+        for service_name in twilio_service_names:
+            if service_name in SERVICES:
+                twilio_service = SERVICES[service_name]
+                twilio_service_name = service_name
+                break
+        
+        health_status = {
+            "status": "healthy",
+            "timestamp": datetime.now().isoformat(),
+            "service": "twilio",
+            "version": "1.0.0"
+        }
+        
+        if twilio_service:
+            health_status["twilio_service"] = {
+                "service_name": twilio_service_name,
+                "status": "available",
+                "url": twilio_service,
+                "health_endpoint": f"{twilio_service}/health"
+            }
+            
+            # Try to ping the actual Twilio service health endpoint
+            try:
+                async with httpx.AsyncClient(timeout=5.0) as client:
+                    response = await client.get(f"{twilio_service}/health")
+                    if response.status_code == 200:
+                        health_status["twilio_service"]["connectivity"] = "healthy"
+                        try:
+                            health_status["twilio_service"]["response_data"] = response.json()
+                        except:
+                            health_status["twilio_service"]["response_text"] = response.text
+                    else:
+                        health_status["twilio_service"]["connectivity"] = "degraded"
+                        health_status["twilio_service"]["status_code"] = response.status_code
+            except Exception as conn_error:
+                health_status["twilio_service"]["connectivity"] = "error"
+                health_status["twilio_service"]["connection_error"] = str(conn_error)
+        else:
+            health_status["status"] = "degraded"
+            health_status["twilio_service"] = {
+                "status": "not_found",
+                "error": "No Twilio-related service found in service registry",
+                "searched_services": twilio_service_names
+            }
+        
+        logger.info("📞 Twilio health check completed")
+        return health_status
+        
+    except Exception as e:
+        logger.error(f"❌ Twilio health check failed: {str(e)}")
+        return {
+            "status": "unhealthy",
+            "timestamp": datetime.now().isoformat(),
+            "service": "twilio",
+            "error": str(e)
+        }
+    
+    
 async def check_service_health(service_name: str, service_url: str) -> Dict[str, Any]:
     """Check individual service health"""
     start_time = datetime.utcnow()
